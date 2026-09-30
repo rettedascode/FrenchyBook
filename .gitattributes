@@ -4,3 +4,4 @@ bin/* text eol=lf
 *.png binary
 *.webp binary
 *.jpg binary
+Makefile text eol=lf
