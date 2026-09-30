@@ -36,9 +36,10 @@ flash:
     due_date_removed: 'Rückgabedatum entfernt.'
     due_date_changed: 'Neues Rückgabedatum: {date}.'
     extended: '„{title}“ ist verlängert bis {date}.'
+    handed_over: '„{title}“ ist übergeben – die Leihfrist läuft ab heute. Viel Spaß beim Lesen!'
   request:
     sent: 'Anfrage an {name} geschickt.'
-    accepted: 'Ausleihe an {name} eingetragen – Rückgabe bis {date}.'
+    accepted: 'Angenommen – das Buch ist jetzt für {name} reserviert. Tippe auf „Übergeben“, sobald ihr euch getroffen habt.'
     declined: 'Anfrage von {name} abgelehnt.'
     cancelled: 'Anfrage zurückgezogen.'
   profile:
@@ -110,6 +111,8 @@ status:
   on_loan: 'Aktuell ausgeliehen'
   due: 'Zur Rückgabe fällig'
   due_me: 'Zur Rückgabe fällig · bei dir'
+  reserved: 'Reserviert'
+  reserved_me: 'Für dich reserviert'
 
 cover:
   choose_image: 'Bild auswählen'
@@ -166,6 +169,8 @@ books:
     author: 'Autor: {name}'
     author_remove: 'Autorfilter „{name}“ entfernen'
     empty: 'Sobald mehr Bücher mit Genre, Sprache oder Format eingetragen sind, kannst du hier danach filtern.'
+    near: 'In meinem Bezirk ({district})'
+    district: 'Bezirk'
   empty:
     all_title: 'Hier ist noch alles leer'
     all_text: 'Noch hat niemand ein Buch eingetragen. Mach den Anfang – das dauert keine Minute.'
@@ -320,11 +325,26 @@ loan:
     not_borrower: 'Verlängern kann nur, wer das Buch gerade hat.'
     max_extensions: 'Du hast schon {max}-mal verlängert.'
     waitlist: 'Jemand wartet auf dieses Buch – verlängern geht deshalb gerade nicht.'
+    not_involved: 'Die Übergabe können nur Eigentümer und ausleihende Person bestätigen.'
+    already_handed_over: 'Die Übergabe ist schon bestätigt.'
+    not_handed_over: 'Verlängern geht erst, wenn du das Buch abgeholt hast.'
   extend: 'Um {days} Tage verlängern'
   extend_confirm: 'Die Ausleihe um {days} Tage verlängern? Der Eigentümer bekommt Bescheid.'
   extend_waitlist: '{count, plural, one {Jemand wartet} other {# Personen warten}} auf dieses Buch – verlängern geht deshalb gerade nicht. Bitte gib es pünktlich zurück.'
   extend_max: 'Du hast schon {max}-mal verlängert. Sprich dich für mehr Zeit direkt mit dem Eigentümer ab.'
   back_expected: 'Zurück erwartet am {date}.'
+  reserved_for: 'Reserviert für {name}'
+  handover_owner_hint: 'Sobald du {name} das Buch gegeben hast, tippe auf „Buch übergeben“. Erst dann beginnt die Leihfrist.'
+  handover_owner: 'Buch übergeben'
+  handover_owner_short: 'Übergeben'
+  cancel_reservation: 'Reservierung aufheben'
+  cancel_reservation_confirm: 'Die Reservierung für {name} aufheben? Das Buch ist dann wieder frei.'
+  reserved_for_you: 'Für dich reserviert'
+  pickup_at: 'Abholung bei {name} · {district}'
+  handover_borrower: 'Hab’s bekommen'
+  handover_borrower_hint: 'Tippe darauf, sobald du das Buch in der Hand hast – ab dann läuft die Leihfrist.'
+  reserved_notice: 'Reserviert für {name} – das Buch wird gerade abgeholt. Du kannst dich schon auf die Warteliste setzen.'
+  handover_pending: 'Übergabe ausstehend'
 
 request:
   button: 'Ausleihen anfragen'
@@ -465,8 +485,8 @@ email:
   request_accepted:
     subject: '{name} leiht dir „{title}“'
     text: 'gute Nachrichten: {name} leiht dir „{title}“.'
-    pickup: 'Sprecht euch einfach ab, wann du es abholen kannst.'
-    due: 'Die Rückgabe ist bis zum {date} geplant.'
+    pickup: 'Sprecht euch ab, wann du es abholst. Sobald du es hast, tippe in der App auf „Hab’s bekommen“ – ab dann läuft die Leihfrist.'
+    due: 'Geplante Rückgabe: {date} (verschiebt sich, falls die Abholung später ist).'
   request_declined:
     subject: '„{title}“ klappt gerade leider nicht'
     text: '{name} kann dir „{title}“ gerade leider nicht ausleihen.'
@@ -613,6 +633,7 @@ help:
     legend_available: 'Das Buch ist beim Eigentümer. Du kannst es anfragen und dort abholen.'
     legend_lent: 'Jemand liest das Buch gerade. Du kannst dich auf die Warteliste setzen.'
     legend_overdue: 'Der Rückgabetermin steht kurz bevor oder ist schon vorbei.'
+    legend_reserved: 'Die Anfrage wurde angenommen – das Buch wartet noch auf die Abholung.'
   borrow:
     title: 'Ein Buch ausleihen'
     summary: 'Frag bei deinen Freunden an, ob du ein Buch haben darfst.'

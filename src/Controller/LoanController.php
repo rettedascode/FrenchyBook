@@ -104,6 +104,24 @@ class LoanController extends AbstractController
         return $this->redirectToRoute('app_book_show', ['id' => $book->getId()], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/ausleihen/{id}/uebergeben', name: 'app_loan_handover', requirements: ['id' => Requirement::DIGITS], methods: ['POST'])]
+    public function handover(Request $request, Loan $loan, #[CurrentUser] User $user): Response
+    {
+        $this->checkToken($request, 'handover-loan-'.$loan->getId());
+
+        try {
+            $this->loanManager->confirmHandover($loan, $user);
+            $this->addFlash('success', new TranslatableMessage('flash.loan.handed_over', [
+                'title' => $loan->getBook()->getTitle(),
+                'date' => null !== $loan->getDueAt() ? LocalizedDate::format($loan->getDueAt(), $request->getLocale()) : '',
+            ]));
+        } catch (LoanException $e) {
+            $this->addFlash('info', $e->toMessage());
+        }
+
+        return $this->redirectBack($request, $loan->getBook());
+    }
+
     #[Route('/ausleihen/{id}/verlaengern', name: 'app_loan_extend', requirements: ['id' => Requirement::DIGITS], methods: ['POST'])]
     public function extend(Request $request, Loan $loan, #[CurrentUser] User $user): Response
     {

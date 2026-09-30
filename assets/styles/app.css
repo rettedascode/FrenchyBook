@@ -1765,3 +1765,7 @@ turbo-frame[aria-busy="true"] .result-meta { opacity: .55; transition: opacity .
 }
 
 .section-notice { margin-bottom: var(--space-5); }
+
+/* ---------- 30. Reserviert (Übergabe steht aus) ---------- */
+.badge-reserved { background: var(--accent-soft); color: var(--accent); }
+.badge-reserved::before { background: var(--accent); }

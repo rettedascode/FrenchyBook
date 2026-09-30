@@ -37,9 +37,10 @@ flash:
     due_date_removed: 'Date de retour supprimée.'
     due_date_changed: 'Nouvelle date de retour : {date}.'
     extended: '« {title} » est prolongé jusqu’au {date}.'
+    handed_over: '« {title} » est remis – la durée du prêt commence aujourd’hui. Bonne lecture !'
   request:
     sent: 'Demande envoyée à {name}.'
-    accepted: 'Prêt à {name} enregistré – retour prévu le {date}.'
+    accepted: 'Acceptée – le livre est maintenant réservé pour {name}. Touche « Remis » dès que vous vous êtes vus.'
     declined: 'Demande de {name} refusée.'
     cancelled: 'Demande annulée.'
   profile:
@@ -111,6 +112,8 @@ status:
   on_loan: 'Actuellement prêté'
   due: 'À rendre bientôt'
   due_me: 'À rendre bientôt · chez toi'
+  reserved: 'Réservé'
+  reserved_me: 'Réservé pour toi'
 
 cover:
   choose_image: 'Choisir une image'
@@ -167,6 +170,8 @@ books:
     author: 'Auteur : {name}'
     author_remove: 'Retirer le filtre auteur « {name} »'
     empty: 'Dès que plus de livres auront un genre, une langue ou un format, tu pourras filtrer ici.'
+    near: 'Dans mon quartier ({district})'
+    district: 'Quartier'
   empty:
     all_title: 'C’est encore vide ici'
     all_text: 'Personne n’a encore ajouté de livre. Lance-toi – ça prend moins d’une minute.'
@@ -321,11 +326,26 @@ loan:
     not_borrower: 'Seule la personne qui a le livre peut prolonger.'
     max_extensions: 'Tu as déjà prolongé {max} fois.'
     waitlist: 'Quelqu’un attend ce livre : la prolongation n’est donc pas possible.'
+    not_involved: 'Seuls le propriétaire et la personne qui emprunte peuvent confirmer la remise.'
+    already_handed_over: 'La remise est déjà confirmée.'
+    not_handed_over: 'Tu pourras prolonger une fois le livre récupéré.'
   extend: 'Prolonger de {days} jours'
   extend_confirm: 'Prolonger le prêt de {days} jours ? Le propriétaire sera prévenu.'
   extend_waitlist: '{count, plural, one {Quelqu’un attend} other {# personnes attendent}} ce livre : la prolongation n’est donc pas possible. Merci de le rendre à temps.'
   extend_max: 'Tu as déjà prolongé {max} fois. Pour plus de temps, arrange-toi directement avec le propriétaire.'
   back_expected: 'Retour prévu le {date}.'
+  reserved_for: 'Réservé pour {name}'
+  handover_owner_hint: 'Dès que tu as donné le livre à {name}, touche « Livre remis ». La durée du prêt ne commence qu’à ce moment-là.'
+  handover_owner: 'Livre remis'
+  handover_owner_short: 'Remis'
+  cancel_reservation: 'Annuler la réservation'
+  cancel_reservation_confirm: 'Annuler la réservation pour {name} ? Le livre sera de nouveau libre.'
+  reserved_for_you: 'Réservé pour toi'
+  pickup_at: 'À récupérer chez {name} · {district}'
+  handover_borrower: 'Je l’ai reçu'
+  handover_borrower_hint: 'Touche-le dès que tu as le livre en main : la durée du prêt commence alors.'
+  reserved_notice: 'Réservé pour {name} – le livre va être récupéré. Tu peux déjà t’inscrire sur la liste d’attente.'
+  handover_pending: 'Remise en attente'
 
 request:
   button: 'Demander à l’emprunter'
@@ -466,8 +486,8 @@ email:
   request_accepted:
     subject: '{name} te prête « {title} »'
     text: 'bonne nouvelle : {name} te prête « {title} ».'
-    pickup: 'Mettez-vous d’accord pour que tu passes le chercher.'
-    due: 'Le retour est prévu pour le {date}.'
+    pickup: 'Mettez-vous d’accord pour que tu passes le chercher. Dès que tu l’as, touche « Je l’ai reçu » dans l’appli : la durée du prêt commence alors.'
+    due: 'Retour prévu : {date} (reporté si la remise a lieu plus tard).'
   request_declined:
     subject: '« {title} » n’est pas possible pour le moment'
     text: '{name} ne peut pas te prêter « {title} » pour le moment.'
@@ -614,6 +634,7 @@ help:
     legend_available: 'Le livre est chez son propriétaire. Tu peux le demander et aller le chercher.'
     legend_lent: 'Quelqu’un le lit en ce moment. Tu peux t’inscrire sur la liste d’attente.'
     legend_overdue: 'La date de retour approche ou est déjà passée.'
+    legend_reserved: 'La demande a été acceptée – le livre attend d’être récupéré.'
   borrow:
     title: 'Emprunter un livre'
     summary: 'Demande à tes amis si tu peux avoir un livre.'

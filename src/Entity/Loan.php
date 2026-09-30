@@ -52,6 +52,10 @@ class Loan
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $dueSoonReminderSentAt = null;
 
+    /** Wann das Buch wirklich übergeben wurde (null = reserviert, Abholung steht noch aus) */
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $handedOverAt = null;
+
     /** Wie oft die ausleihende Person selbst verlängert hat */
     #[ORM\Column(type: Types::SMALLINT, options: ['default' => 0])]
     private int $extensionCount = 0;
@@ -69,10 +73,47 @@ class Loan
     /** Ab so vielen Tagen vor dem Termin gilt ein Buch als „zur Rückgabe fällig“ */
     public const DUE_SOON_DAYS = 3;
 
+    public function isHandedOver(): bool
+    {
+        return null !== $this->handedOverAt;
+    }
+
+    public function getHandedOverAt(): ?\DateTimeImmutable
+    {
+        return $this->handedOverAt;
+    }
+
+    /**
+     * Übergabe bestätigen: Die Ausleihe beginnt jetzt. Ein vereinbarter Rückgabetermin
+     * verschiebt sich um die Tage, die bis zur Abholung vergangen sind – die Leihfrist bleibt gleich.
+     */
+    public function confirmHandover(): static
+    {
+        $now = new \DateTimeImmutable();
+        if (null !== $this->dueAt) {
+            $waited = (int) $this->lentAt->setTime(0, 0)->diff($now->setTime(0, 0))->days;
+            if ($waited > 0) {
+                $this->dueAt = $this->dueAt->modify(sprintf('+%d days', $waited));
+            }
+        }
+        $this->lentAt = $now;
+        $this->handedOverAt = $now;
+
+        return $this;
+    }
+
+    /** Direkt übergeben (z. B. wenn der Eigentümer das Buch persönlich weitergibt und gleich einträgt) */
+    public function markHandedOver(): static
+    {
+        $this->handedOverAt = $this->lentAt;
+
+        return $this;
+    }
+
     /** Rückgabetermin in wenigen Tagen oder schon vorbei */
     public function isReturnDue(?\DateTimeImmutable $today = null): bool
     {
-        if (!$this->isActive() || null === $this->dueAt) {
+        if (!$this->isActive() || !$this->isHandedOver() || null === $this->dueAt) {
             return false;
         }
         $today ??= new \DateTimeImmutable('today');
@@ -87,7 +128,7 @@ class Loan
 
     public function canBeExtended(): bool
     {
-        return $this->isActive() && $this->extensionCount < self::MAX_EXTENSIONS;
+        return $this->isActive() && $this->isHandedOver() && $this->extensionCount < self::MAX_EXTENSIONS;
     }
 
     /** Neuer Termin: vom bisherigen Termin (oder heute, falls der schon vorbei ist) + 2 Wochen */
@@ -122,6 +163,9 @@ class Loan
 
     public function isOverdue(?\DateTimeImmutable $today = null): bool
     {
+        if (!$this->isHandedOver()) {
+            return false;
+        }
         if (!$this->isActive() || null === $this->dueAt) {
             return false;
         }

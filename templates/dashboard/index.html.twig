@@ -63,18 +63,28 @@
                     <div class="list-item-body">
                         <a class="list-item-title" href="{{ path('app_book_show', {id: loan.book.id}) }}">{{ loan.book.title }}</a>
                         <div class="list-item-meta">{{ 'dashboard.at'|trans }} <strong>{{ loan.borrower.name }}</strong> · {{ loan.lentAt|since }}</div>
-                        {% if loan.overdue %}
+                        {% if not loan.handedOver %}
+                            <span class="badge badge-reserved">{{ 'loan.handover_pending'|trans }}</span>
+                        {% elseif loan.overdue %}
                             <span class="badge badge-overdue">{{ 'loan.overdue_since'|trans({days: loan.daysOverdue}) }}</span>
                         {% elseif loan.dueAt %}
                             <span class="badge badge-lent">{{ 'loan.due_until'|trans({date: loan.dueAt|ldate('short')}) }}</span>
                         {% endif %}
                     </div>
                     <div class="list-item-actions">
-                        <form method="post" action="{{ path('app_loan_return', {id: loan.id}) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('return-loan-' ~ loan.id) }}">
-                            <input type="hidden" name="from" value="dashboard">
-                            <button type="submit" class="btn btn-secondary btn-sm">{{ icon('return', 'icon-sm') }} {{ 'dashboard.is_back'|trans }}</button>
-                        </form>
+                        {% if not loan.handedOver %}
+                            <form method="post" action="{{ path('app_loan_handover', {id: loan.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ loan.id) }}">
+                                <input type="hidden" name="from" value="dashboard">
+                                <button type="submit" class="btn btn-primary btn-sm">{{ icon('check', 'icon-sm') }} {{ 'loan.handover_owner_short'|trans }}</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{{ path('app_loan_return', {id: loan.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('return-loan-' ~ loan.id) }}">
+                                <input type="hidden" name="from" value="dashboard">
+                                <button type="submit" class="btn btn-secondary btn-sm">{{ icon('return', 'icon-sm') }} {{ 'dashboard.is_back'|trans }}</button>
+                            </form>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
@@ -97,13 +107,27 @@
                     <a href="{{ path('app_book_show', {id: loan.book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: loan.book, size: 'mini', decorative: true}) }}</a>
                     <div class="list-item-body">
                         <a class="list-item-title" href="{{ path('app_book_show', {id: loan.book.id}) }}">{{ loan.book.title }}</a>
-                        <div class="list-item-meta">{{ 'dashboard.from'|trans }} <strong>{{ loan.book.owner.name }}</strong> · {{ loan.lentAt|since }}</div>
-                        {% if loan.overdue %}
+                        {% if not loan.handedOver %}
+                            <div class="list-item-meta">{{ 'loan.pickup_at'|trans({name: loan.book.owner.name, district: loan.book.owner.district ? loan.book.owner.district|trans : '–'}) }}</div>
+                            <span class="badge badge-reserved">{{ 'status.reserved_me'|trans }}</span>
+                        {% else %}
+                            <div class="list-item-meta">{{ 'dashboard.from'|trans }} <strong>{{ loan.book.owner.name }}</strong> · {{ loan.lentAt|since }}</div>
+                        {% endif %}
+                        {% if not loan.handedOver %}{% elseif loan.overdue %}
                             <span class="badge badge-overdue">{{ 'loan.should_be_back'|trans({date: loan.dueAt|ldate('short')}) }}</span>
                         {% elseif loan.dueAt %}
                             <span class="badge badge-lent">{{ 'loan.due_until'|trans({date: loan.dueAt|ldate('short')}) }}</span>
                         {% endif %}
                     </div>
+                    {% if not loan.handedOver %}
+                        <div class="list-item-actions">
+                            <form method="post" action="{{ path('app_loan_handover', {id: loan.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ loan.id) }}">
+                                <input type="hidden" name="from" value="dashboard">
+                                <button type="submit" class="btn btn-primary btn-sm">{{ icon('check', 'icon-sm') }} {{ 'loan.handover_borrower'|trans }}</button>
+                            </form>
+                        </div>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

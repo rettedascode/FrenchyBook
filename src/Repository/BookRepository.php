@@ -176,6 +176,16 @@ class BookRepository extends ServiceEntityRepository
             $qb->andWhere(sprintf('EXISTS (%s)', $activeLoan));
         }
 
+        // Bezirk: wo das Buch gerade ist – bei der ausleihenden Person (nach der Übergabe), sonst beim Eigentümer
+        $district = $filter->district ?? ($filter->near ? $me->getDistrict() : null);
+        if (null !== $district) {
+            $handedOver = sprintf('SELECT hl.id FROM %s hl WHERE hl.book = b AND hl.returnedAt IS NULL AND hl.handedOverAt IS NOT NULL', Loan::class);
+            $atBorrower = sprintf('SELECT dl.id FROM %s dl JOIN dl.borrower dlb WHERE dl.book = b AND dl.returnedAt IS NULL AND dl.handedOverAt IS NOT NULL AND dlb.district = :district', Loan::class);
+            $qb->join('b.owner', 'district_owner')
+                ->andWhere(sprintf('EXISTS (%s) OR (NOT EXISTS (%s) AND district_owner.district = :district)', $atBorrower, $handedOver))
+                ->setParameter('district', $district->value);
+        }
+
         if ($filter->mine) {
             $qb->andWhere('b.owner = :me')->setParameter('me', $me);
         } elseif (null !== $filter->owner) {

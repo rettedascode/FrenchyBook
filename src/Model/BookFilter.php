@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Enum\BookFormat;
+use App\Enum\District;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -28,6 +29,10 @@ final class BookFilter
     public ?BookFormat $format = null;
     public ?int $owner = null;
     public ?int $author = null;
+    /** Kölner Bezirk, in dem sich das Buch gerade befindet */
+    public ?District $district = null;
+    /** Schnellfilter „In meinem Bezirk“ (Bezirk aus dem eigenen Profil) */
+    public bool $near = false;
     public string $sort = 'new';
     public int $page = 1;
 
@@ -43,6 +48,8 @@ final class BookFilter
         $filter->format = BookFormat::tryFrom($q->getString('format'));
         $filter->owner = self::positiveInt($q->get('owner'));
         $filter->author = self::positiveInt($q->get('author'));
+        $filter->district = District::tryFrom($q->getString('bezirk'));
+        $filter->near = $q->getBoolean('nah');
         $filter->sort = \array_key_exists($q->getString('sort'), self::SORTS) ? $q->getString('sort') : 'new';
         $filter->page = max(1, min(1000, (int) $q->get('page', 1)));
 
@@ -61,6 +68,8 @@ final class BookFilter
             'format' => $this->format?->value,
             'owner' => $this->owner,
             'author' => $this->author,
+            'bezirk' => $this->district?->value,
+            'nah' => $this->near ? 1 : null,
             'sort' => 'new' !== $this->sort ? $this->sort : null,
         ], static fn ($v) => null !== $v && '' !== $v);
     }
@@ -81,13 +90,14 @@ final class BookFilter
     public function hasActiveFilters(): bool
     {
         return '' !== $this->q || null !== $this->status || $this->mine || null !== $this->genre
-            || null !== $this->language || null !== $this->format || null !== $this->owner || null !== $this->author;
+            || null !== $this->language || null !== $this->format || null !== $this->owner || null !== $this->author
+            || null !== $this->district || $this->near;
     }
 
     /** Anzahl der Filter aus dem „Mehr Filter“-Bereich (für die Chip-Beschriftung). */
     public function countDetailFilters(): int
     {
-        return \count(array_filter([$this->genre, $this->language, $this->format, $this->owner, $this->author]));
+        return \count(array_filter([$this->genre, $this->language, $this->format, $this->owner, $this->author, $this->district]));
     }
 
     private static function positiveInt(mixed $value): ?int

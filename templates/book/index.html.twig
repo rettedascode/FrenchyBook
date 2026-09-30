@@ -37,6 +37,12 @@
                     <input type="checkbox" id="f-mine" name="mine" value="1"{{ filter.mine ? ' checked' }}>
                     <label for="f-mine" class="chip">{{ 'books.filter.mine'|trans }}</label>
                 </span>
+                {% if app.user.district %}
+                    <span class="chip-choice">
+                        <input type="checkbox" id="f-near" name="nah" value="1"{{ filter.near ? ' checked' }}>
+                        <label for="f-near" class="chip">{{ icon('map-pin') }} {{ 'books.filter.near'|trans({district: app.user.district|trans}) }}</label>
+                    </span>
+                {% endif %}
                 {% set detail_count = filter.countDetailFilters %}
                 <button type="button" class="chip{{ detail_count ? ' is-active' }}" data-action="toggle#toggle"
                         data-toggle-target="button" aria-expanded="{{ detail_count ? 'true' : 'false' }}" aria-controls="filter-panel">
@@ -75,6 +81,11 @@
                         {% for format in formats %}{{ _self.chip_radio('format', format.value, format|trans, filter.format.value ?? '') }}{% endfor %}
                     </div>
                 {% endif %}
+                <h3 id="f-district-label">{{ 'books.filter.district'|trans }}</h3>
+                <div class="chips" role="group" aria-labelledby="f-district-label">
+                    {{ _self.chip_radio('bezirk', '', all, filter.district.value ?? '') }}
+                    {% for d in districts %}{{ _self.chip_radio('bezirk', d.value, d|trans, filter.district.value ?? '') }}{% endfor %}
+                </div>
                 {% if owners|length > 1 %}
                     <h3 id="f-owner-label">{{ 'books.filter.owner'|trans }}</h3>
                     <div class="chips" role="group" aria-labelledby="f-owner-label">

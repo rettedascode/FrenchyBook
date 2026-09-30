@@ -170,7 +170,10 @@ class Book
     /** Wer hat das Buch gerade in der Hand? Die ausleihende Person – oder der Eigentümer. */
     public function getHolder(): ?User
     {
-        return $this->getActiveLoan()?->getBorrower() ?? $this->owner;
+        $loan = $this->getActiveLoan();
+
+        // Reserviert, aber noch nicht abgeholt → liegt noch beim Eigentümer
+        return null !== $loan && $loan->isHandedOver() ? $loan->getBorrower() : $this->owner;
     }
 
     /** Kölner Bezirk, in dem sich das Buch gerade befindet */
@@ -180,7 +183,8 @@ class Book
     }
 
     /**
-     * „available“ = Abholung bei Eigentümer, „lent“ = aktuell ausgeliehen,
+     * „available“ = Abholung bei Eigentümer, „reserved“ = für jemanden reserviert (Übergabe steht aus),
+     * „lent“ = aktuell ausgeliehen,
      * „due“ = zur Rückgabe fällig (Termin in wenigen Tagen oder schon vorbei)
      */
     public function getCirculationStatus(): string
@@ -189,6 +193,7 @@ class Book
 
         return match (true) {
             null === $loan => 'available',
+            !$loan->isHandedOver() => 'reserved',
             $loan->isReturnDue() => 'due',
             default => 'lent',
         };

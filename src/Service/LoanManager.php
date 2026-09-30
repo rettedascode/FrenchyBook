@@ -34,13 +34,17 @@ class LoanManager
     ) {
     }
 
-    public function lend(Book $book, User $borrower, ?\DateTimeImmutable $dueAt = null, ?string $note = null): Loan
+    /**
+     * @param bool $handedOver true = Buch wird gerade persönlich übergeben (direkt verleihen),
+     *                         false = reserviert, die Übergabe bestätigt später jemand (angenommene Anfrage)
+     */
+    public function lend(Book $book, User $borrower, ?\DateTimeImmutable $dueAt = null, ?string $note = null, bool $handedOver = true): Loan
     {
         if ($book->isOwnedBy($borrower)) {
             throw new LoanException('loan.error.own_book');
         }
 
-        $loan = $this->em->wrapInTransaction(function () use ($book, $borrower, $dueAt, $note): Loan {
+        $loan = $this->em->wrapInTransaction(function () use ($book, $borrower, $dueAt, $note, $handedOver): Loan {
             // Direkt in der Datenbank prüfen, nicht nur in der geladenen Collection
             if (null !== $this->loans->findActiveForBook($book)) {
                 throw new LoanException('loan.error.already_lent', ['title' => $book->getTitle()]);
@@ -50,6 +54,9 @@ class LoanManager
                 ->setBorrower($borrower)
                 ->setDueAt($dueAt?->setTime(0, 0))
                 ->setNote($note);
+            if ($handedOver) {
+                $loan->markHandedOver();
+            }
             $this->em->persist($loan);
 
             // Hatte die Person das Buch angefragt, ist die Anfrage damit erledigt.
@@ -121,7 +128,8 @@ class LoanManager
         }
 
         $dueAt = new \DateTimeImmutable(sprintf('today +%d days', self::DEFAULT_LOAN_DAYS));
-        $loan = $this->lend($request->getBook(), $request->getRequester(), $dueAt);
+        // Angenommen heißt: reserviert – die Leihfrist beginnt erst mit der Übergabe
+        $loan = $this->lend($request->getBook(), $request->getRequester(), $dueAt, null, false);
         $request->accept();
         $this->em->flush();
 
@@ -151,6 +159,24 @@ class LoanManager
         $this->em->flush();
     }
 
+    /** Eigentümer oder ausleihende Person bestätigt: Das Buch ist übergeben. */
+    public function confirmHandover(Loan $loan, User $user): void
+    {
+        $isBorrower = $loan->getBorrower()?->getId() === $user->getId();
+        if (!$isBorrower && !$loan->getBook()->isOwnedBy($user)) {
+            throw new LoanException('loan.error.not_involved');
+        }
+        if (!$loan->isActive()) {
+            throw new LoanException('loan.error.finished');
+        }
+        if ($loan->isHandedOver()) {
+            throw new LoanException('loan.error.already_handed_over');
+        }
+
+        $loan->confirmHandover();
+        $this->em->flush();
+    }
+
     /** Die ausleihende Person verlängert selbst um 2 Wochen. */
     public function extend(Loan $loan, User $user): void
     {
@@ -159,6 +185,9 @@ class LoanManager
         }
         if (!$loan->isActive()) {
             throw new LoanException('loan.error.finished');
+        }
+        if (!$loan->isHandedOver()) {
+            throw new LoanException('loan.error.not_handed_over');
         }
         if (!$loan->canBeExtended()) {
             throw new LoanException('loan.error.max_extensions', ['max' => Loan::MAX_EXTENSIONS]);

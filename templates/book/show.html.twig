@@ -63,6 +63,25 @@
                     <div class="notice">{{ icon('users') }}<p>{{ 'lend.no_friends'|trans }}</p></div>
                 {% endif %}
 
+            {% elseif is_owner and not activeLoan.handedOver %}
+                {# Besitzer, Anfrage angenommen → Übergabe bestätigen #}
+                <div class="card card-tight status-card">
+                    <div class="status-line">
+                        <span class="avatar" style="--av: {{ avatar_color(activeLoan.borrower) }}" aria-hidden="true">{{ activeLoan.borrower.initial }}</span>
+                        <p><strong>{{ 'loan.reserved_for'|trans({name: activeLoan.borrower.name}) }}</strong><br>
+                           <span class="subtle">{{ 'loan.handover_owner_hint'|trans({name: activeLoan.borrower.name}) }}</span></p>
+                    </div>
+                    <form method="post" action="{{ path('app_loan_handover', {id: activeLoan.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ activeLoan.id) }}">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('check') }} {{ 'loan.handover_owner'|trans }}</button>
+                    </form>
+                    <form method="post" action="{{ path('app_loan_return', {id: activeLoan.id}) }}"
+                          data-turbo-confirm="{{ 'loan.cancel_reservation_confirm'|trans({name: activeLoan.borrower.name}) }}" data-confirm-button="{{ 'loan.cancel_reservation'|trans }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('return-loan-' ~ activeLoan.id) }}">
+                        <button type="submit" class="btn btn-ghost btn-sm btn-block">{{ 'loan.cancel_reservation'|trans }}</button>
+                    </form>
+                </div>
+
             {% elseif is_owner %}
                 {# Besitzer, Buch ist verliehen → Rückgabe bestätigen #}
                 <div class="card card-tight status-card">
@@ -97,6 +116,20 @@
                     </details>
                 </div>
 
+            {% elseif lent_to_me and not activeLoan.handedOver %}
+                <div class="card card-tight status-card">
+                    <div class="status-line">
+                        <span class="avatar" style="--av: {{ avatar_color(book.owner) }}" aria-hidden="true">{{ book.owner.initial }}</span>
+                        <p><strong>{{ 'loan.reserved_for_you'|trans }}</strong><br>
+                           <span class="subtle">{{ 'loan.pickup_at'|trans({name: book.owner.name, district: book.owner.district ? book.owner.district|trans : '–'}) }}</span></p>
+                    </div>
+                    <form method="post" action="{{ path('app_loan_handover', {id: activeLoan.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ activeLoan.id) }}">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('check') }} {{ 'loan.handover_borrower'|trans }}</button>
+                    </form>
+                    <p class="subtle" style="margin:0">{{ 'loan.handover_borrower_hint'|trans }}</p>
+                </div>
+
             {% elseif lent_to_me %}
                 <div class="card card-tight status-card">
                     <div class="status-line">
@@ -122,7 +155,11 @@
                 </div>
 
             {% elseif activeLoan %}
-                <div class="notice notice-warning">{{ icon('clock') }}<p>{{ 'loan.currently_at'|trans({name: activeLoan.borrower.name, since: activeLoan.lentAt|since}) }}{% if activeLoan.dueAt %} {{ 'loan.back_expected'|trans({date: activeLoan.dueAt|ldate}) }}{% endif %}</p></div>
+                {% if activeLoan.handedOver %}
+                    <div class="notice notice-warning">{{ icon('clock') }}<p>{{ 'loan.currently_at'|trans({name: activeLoan.borrower.name, since: activeLoan.lentAt|since}) }}{% if activeLoan.dueAt %} {{ 'loan.back_expected'|trans({date: activeLoan.dueAt|ldate}) }}{% endif %}</p></div>
+                {% else %}
+                    <div class="notice">{{ icon('clock') }}<p>{{ 'loan.reserved_notice'|trans({name: activeLoan.borrower.name}) }}</p></div>
+                {% endif %}
                 {% set my_position = book.waitlistPosition(app.user) %}
                 {% if my_position %}
                     <div class="card card-tight status-card">
@@ -182,7 +219,8 @@
         </section>
 
         {# ---------- Standort & Status: Wem gehört es, wer hat es, wo ist es? ---------- #}
-        {% set holder = activeLoan ? activeLoan.borrower : book.owner %}
+        {% set handed_over = activeLoan and activeLoan.handedOver %}
+        {% set holder = handed_over ? activeLoan.borrower : book.owner %}
         <section class="card card-tight location-card" aria-labelledby="h-location">
             <h2 class="section-title" id="h-location">{{ icon('map-pin') }} {{ 'book.location.title'|trans }}</h2>
             <dl class="location-list">
@@ -192,7 +230,7 @@
                 </div>
                 <div>
                     <dt>{{ 'book.location.holder'|trans }}</dt>
-                    <dd>{% if activeLoan %}<strong>{{ lent_to_me ? 'book.show.you'|trans : activeLoan.borrower.fullName }}</strong>{% if activeLoan.borrower.district %} · {{ activeLoan.borrower.district|trans }}{% endif %}{% else %}{{ 'book.location.at_owner'|trans }}{% endif %}</dd>
+                    <dd>{% if handed_over %}<strong>{{ lent_to_me ? 'book.show.you'|trans : activeLoan.borrower.fullName }}</strong>{% if activeLoan.borrower.district %} · {{ activeLoan.borrower.district|trans }}{% endif %}{% else %}{{ 'book.location.at_owner'|trans }}{% endif %}</dd>
                 </div>
                 <div>
                     <dt>{{ 'book.location.status'|trans }}</dt>

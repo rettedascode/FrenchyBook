@@ -1,6 +1,7 @@
 {#
     Status eines Buchs:
-    grün „Abholung bei Eigentümer“, orange „Aktuell ausgeliehen“ (bzw. „Bei dir“),
+    grün „Abholung bei Eigentümer“, blau „Reserviert“ (angenommen, Übergabe steht aus),
+    orange „Aktuell ausgeliehen“ (bzw. „Bei dir“),
     rot „Zur Rückgabe fällig“ (Termin in wenigen Tagen oder überschritten).
     Parameter: loan (aktive Ausleihe oder null)
 #}
@@ -8,7 +9,9 @@
     <span class="badge badge-available"><span>{{ 'status.pickup'|trans }}</span></span>
 {%- else -%}
     {%- set is_me = app.user and loan.borrower.id == app.user.id -%}
-    {%- if loan.returnDue -%}
+    {%- if not loan.handedOver -%}
+        <span class="badge badge-reserved"><span>{{ is_me ? 'status.reserved_me'|trans : 'status.reserved'|trans }}</span></span>
+    {%- elseif loan.returnDue -%}
         <span class="badge badge-overdue" title="{{ 'status.due_hint'|trans({date: loan.dueAt|ldate}) }}"><span>{{ is_me ? 'status.due_me'|trans : 'status.due'|trans }}</span></span>
     {%- else -%}
         <span class="badge badge-lent"><span>{{ is_me ? 'status.lent_me'|trans : 'status.on_loan'|trans }}</span></span>

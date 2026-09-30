@@ -7,6 +7,7 @@ use App\Entity\Book;
 use App\Entity\Genre;
 use App\Entity\User;
 use App\Enum\BookFormat;
+use App\Enum\District;
 use App\Exception\CoverException;
 use App\Exception\OpenLibraryException;
 use App\Form\BookType;
@@ -88,6 +89,7 @@ class BookController extends AbstractController
             'languages' => $this->books->findUsedLanguages(),
             'formats' => $this->books->findUsedFormats(),
             'owners' => $users->findOwnersWithBooks(),
+            'districts' => District::cases(),
             'activeAuthor' => $filter->author ? $authors->find($filter->author) : null,
         ]);
     }
