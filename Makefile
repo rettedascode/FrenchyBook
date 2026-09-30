@@ -17,7 +17,7 @@ SERVER  := frenchybook
 APP_DIR := /var/www/frenchybook.com
 PROD    := cd $(APP_DIR) && sudo -u www-data APP_ENV=prod php bin/console
 
-.PHONY: help install start stop cc migrate fixtures db-reset lint test reminders \
+.PHONY: help install start stop cc migrate fixtures db-reset lint test deps-update reminders \
 	    deploy rollback guides-upload ssh status logs backup invite-code reminders-live admins
 
 help: ## Diese Übersicht
@@ -59,6 +59,12 @@ lint: ## Templates, YAML, Container und Datenbank-Schema prüfen
 
 test: ## PHPUnit-Tests ausführen
 	php bin/phpunit
+
+deps-update: ## Pakete aktualisieren (wie Dependabot) – danach prüfen, committen, make deploy
+	composer update --no-interaction
+	$(CONSOLE) importmap:outdated || true
+	$(MAKE) --no-print-directory lint
+	@git status --short composer.json composer.lock
 
 reminders: ## Erinnerungen lokal testen (verschickt nichts)
 	$(CONSOLE) app:send-reminders --dry-run

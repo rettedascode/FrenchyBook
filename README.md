@@ -276,6 +276,18 @@ bin/deploy            # unter Windows in Git Bash
 
 Der Server ist nur per SSH-Schlüssel erreichbar (Kürzel `frenchybook` in `~/.ssh/config`), fail2ban sperrt Passwort-Rater.
 
+### Paket-Updates (Dependabot)
+
+Dependabot ([.github/dependabot.yml](.github/dependabot.yml)) prüft jeden Montag die Composer-Pakete und öffnet bei Bedarf **eine** gebündelte Pull-Request. Dabei wird nur `composer.lock` innerhalb der Versionsgrenzen aktualisiert, es gibt also keine neuen Hauptversionen. Die PHP-Version des Servers (8.3.6) ist in `composer.json` unter `config.platform` festgelegt.
+
+Damit im Repository nur **RetteDasCode** als Autor steht, die Pull-Request nicht auf GitHub mergen, sondern lokal übernehmen:
+
+```bash
+make deps-update                     # composer update + Prüfungen
+git add composer.lock && git commit -m "Composer: Paket-Updates"
+make deploy                          # Dependabot schließt seine Pull-Request dann selbst
+```
+
 ### Backup
 
 Jede Nacht um 2:15 UTC sichert `/usr/local/bin/frenchybook-backup` (Quelle: [deploy/frenchybook-backup.sh](deploy/frenchybook-backup.sh)) die Datenbank und alle Cover:

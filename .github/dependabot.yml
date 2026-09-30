@@ -1,0 +1,27 @@
+# Dependabot: prüft jede Woche, ob es neue Versionen der PHP-Pakete (Composer) gibt.
+#
+# - Nur das composer.lock wird aktualisiert (innerhalb der Versionsgrenzen aus composer.json),
+#   deshalb keine Sprünge auf neue Hauptversionen wie Symfony 8.
+# - Alle Updates kommen gebündelt in EINER Pull-Request pro Woche.
+# - composer.json legt die PHP-Version des Servers fest (config.platform.php = 8.3.6),
+#   damit nichts vorgeschlagen wird, was dort nicht läuft.
+#
+# JavaScript läuft über Symfony AssetMapper/importmap – das kennt Dependabot nicht.
+# Dafür: php bin/console importmap:outdated
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    versioning-strategy: lockfile-only
+    open-pull-requests-limit: 5
+    groups:
+      composer:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "Composer"
