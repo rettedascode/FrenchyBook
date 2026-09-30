@@ -23,6 +23,10 @@ Unsere gemeinsame Bibliothek: Jeder trägt seine Bücher ein, man sieht auf eine
 - **Warteliste:** Bei ausgeliehenen Büchern kann man sich eintragen. Nach der Rückgabe wird die erste Person per E-Mail und Push benachrichtigt. Fragt sie an oder bekommt sie das Buch, verschwindet ihr Eintrag.
 - **Benachrichtigungen:** neue Ausleihe (E-Mail + Push), 2 Tage vor dem Rückgabetermin, bei Überfälligkeit (wöchentlich) und wenn ein Buch von der Warteliste frei wird. Den Versand übernimmt der tägliche Cron `app:send-reminders` (`--before=2`, `--interval=7`).
 
+### Häufige Befehle (Makefile)
+
+`make` zeigt alle Befehle. Die wichtigsten: `make start` (lokaler Server), `make fixtures` (Beispieldaten), `make lint`, `make deploy` (live schalten), `make status` (Live-Version, Backup, Website), `make logs`, `make backup`. Unter Windows laufen alle Befehle automatisch über Git Bash.
+
 ## 1. Voraussetzungen
 
 - **PHP 8.3 oder neuer** mit den Erweiterungen `pdo_sqlite` (bzw. `pdo_mysql`/`pdo_pgsql`), `gd` (mit WebP-Unterstützung), `intl`, `fileinfo`, `mbstring`, `exif` (empfohlen, damit Handyfotos richtig gedreht werden)
