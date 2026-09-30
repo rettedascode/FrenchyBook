@@ -1,0 +1,27 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin_title %}{{ 'admin.nav.users'|trans }}{% endblock %}
+{% block admin_section %}users{% endblock %}
+
+{% block admin_body %}
+<p class="muted">{{ 'admin.users.intro'|trans({count: users|length}) }}</p>
+<ul class="list">
+    {% for user in users %}
+        <li class="list-item admin-user-item">
+            <span class="avatar" style="--av: {{ avatar_color(user) }}" aria-hidden="true">{{ user.initial }}</span>
+            <div class="list-item-body">
+                <a class="list-item-title" href="{{ path('admin_user_show', {id: user.id}) }}">{{ user.name }}</a>
+                {% if user.admin %}<span class="badge badge-admin">{{ 'admin.users.is_admin'|trans }}</span>{% endif %}
+                <div class="list-item-meta">{{ user.fullName }}{% if user.district %} · {{ user.district|trans }}{% endif %}</div>
+                <div class="list-item-meta">{{ user.email }}</div>
+                <div class="list-item-meta">
+                    {{ 'admin.users.book_count'|trans({count: bookCounts[user.id] ?? 0}) }}
+                    · {{ 'admin.users.borrowed_count'|trans({count: borrowedCounts[user.id] ?? 0}) }}
+                    · {% if user.lastLoginAt %}{{ 'admin.users.last_login'|trans({when: user.lastLoginAt|relative_date}) }}{% else %}{{ 'admin.users.never_logged_in'|trans }}{% endif %}
+                </div>
+            </div>
+            {{ icon('chevron-right', 'icon-sm admin-chevron') }}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

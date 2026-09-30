@@ -1,0 +1,169 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ (mode == 'new' ? 'nav.add' : 'book.edit.title')|trans }}{% endblock %}
+{% block nav_section %}{{ mode == 'new' ? 'add' : 'books' }}{% endblock %}
+
+{% block body %}
+{% set detail_fields = ['awards', 'subtitle', 'isbn', 'publisher', 'publishedYear', 'language', 'pageCount', 'format', 'genres', 'newGenre', 'series', 'seriesNumber', 'description', 'condition', 'ownerNote'] %}
+{% set details_have_errors = false %}
+{% for name in detail_fields %}
+    {% if form[name] is defined and form[name].vars.errors|length > 0 %}{% set details_have_errors = true %}{% endif %}
+{% endfor %}
+{% set remote_cover = form.coverUrl.vars.value %}
+
+<div class="isbn-step">
+    {% if mode == 'new' %}
+        <a class="back-link" href="{{ path('app_book_new', scanMode ? {scan: 1} : {}) }}">{{ icon('arrow-left', 'icon-sm') }} {{ 'book.new.other_isbn'|trans }}</a>
+        <div class="page-header">
+            <div>
+                <p class="subtle" style="margin:0">{{ 'book.new.step'|trans({step: 2}) }}</p>
+                <h1>{{ 'book.new.check_title'|trans }}</h1>
+            </div>
+        </div>
+    {% else %}
+        <a class="back-link" href="{{ path('app_book_show', {id: book.id}) }}">{{ icon('arrow-left', 'icon-sm') }} {{ 'book.edit.back'|trans }}</a>
+        <div class="page-header"><h1>{{ 'book.edit.title'|trans }}</h1></div>
+    {% endif %}
+
+    <div class="stack">
+        {% if lookupStatus == 'found' %}
+            <div class="notice notice-success">{{ icon('sparkles') }}<p>{{ 'book.new.lookup_found'|trans|raw }}</p></div>
+        {% elseif lookupStatus == 'not_found' %}
+            <div class="notice notice-warning">{{ icon('info') }}<p>{{ 'book.new.lookup_not_found'|trans }}</p></div>
+        {% elseif lookupStatus == 'unavailable' %}
+            <div class="notice notice-warning">{{ icon('info') }}<p>{{ 'book.new.lookup_unavailable'|trans }}</p></div>
+        {% endif %}
+        {% if duplicate %}
+            <div class="notice">{{ icon('info') }}<p>{{ 'book.new.duplicate'|trans }} <a href="{{ path('app_book_show', {id: duplicate.id}) }}">{{ 'book.new.duplicate_link'|trans({title: duplicate.title}) }}</a>. {{ 'book.new.duplicate_hint'|trans }}</p></div>
+        {% endif %}
+
+        {{ form_start(form, {attr: {class: 'form', novalidate: 'novalidate'}}) }}
+            {{ form_errors(form) }}
+
+            <div class="card form">
+                {# Cover: Vorschau + Foto aufnehmen/auswählen #}
+                <div class="form-row{{ form.coverFile.vars.errors|length ? ' has-error' }}" data-controller="cover-preview"
+                     data-cover-preview-messages-value="{{ {
+                        format: 'cover.js.format'|trans,
+                        tooLarge: 'cover.js.too_large'|trans,
+                        preparing: 'cover.js.preparing'|trans,
+                        otherPhoto: 'cover.other_photo'|trans,
+                        takePhoto: 'cover.take_photo'|trans,
+                        willUpload: 'cover.js.will_upload'|trans,
+                        previewAlt: 'cover.js.preview_alt'|trans,
+                        notFound: 'cover.js.not_found'|trans,
+                        notFoundHint: 'cover.js.not_found_hint'|trans,
+                     }|json_encode }}">
+                    <span class="form-label">{{ 'book.field.cover'|trans }}</span>
+                    <div class="cover-field">
+                        <div data-cover-preview-target="frame">
+                            {% if remote_cover %}
+                                <div class="cover"><img src="{{ remote_cover }}" alt="{{ 'cover.suggestion_alt'|trans }}" data-action="error->cover-preview#remoteFailed" referrerpolicy="no-referrer"></div>
+                            {% else %}
+                                {{ include('book/_cover.html.twig', {book: book, size: 'mini', decorative: true}) }}
+                            {% endif %}
+                        </div>
+                        {% set has_cover = book.coverImage or remote_cover %}
+                        <div class="cover-field-actions">
+                            {# Ein gemeinsames Datei-Feld – die Buttons öffnen es mit oder ohne Kamera #}
+                            {{ form_widget(form.coverFile, {attr: {class: 'cover-input', tabindex: '-1', 'aria-describedby': form.coverFile.vars.id ~ '_help'}}) }}
+
+                            {# Handy/Tablet: Kamera direkt öffnen oder aus der Galerie wählen #}
+                            <button type="button" class="btn {{ has_cover ? 'btn-secondary' : 'btn-primary' }} only-touch" data-action="cover-preview#takePhoto">
+                                {{ icon('camera') }}
+                                <span data-cover-preview-target="label">{{ (has_cover ? 'cover.other_photo' : 'cover.take_photo')|trans }}</span>
+                            </button>
+                            <button type="button" class="btn btn-ghost btn-sm only-touch" data-action="cover-preview#pickFromGallery">
+                                {{ icon('image', 'icon-sm') }} {{ 'cover.from_gallery'|trans }}
+                            </button>
+
+                            {# Computer: normale Dateiauswahl #}
+                            <button type="button" class="btn btn-secondary only-pointer" data-action="cover-preview#pickFromGallery">
+                                {{ icon('image') }} <span>{{ 'cover.choose_image'|trans }}</span>
+                            </button>
+                            <p class="form-help" id="{{ form.coverFile.vars.id }}_help" data-cover-preview-target="hint">
+                                {{ (remote_cover ? 'cover.hint_remote' : 'cover.hint')|trans }}
+                            </p>
+                            {% if form.removeCover is defined %}
+                                <label class="checkbox-row small" for="{{ form.removeCover.vars.id }}" style="min-height:40px">
+                                    {{ form_widget(form.removeCover) }} <span>{{ 'book.field.remove_cover'|trans }}</span>
+                                </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {{ form_errors(form.coverFile) }}
+                    <ul data-cover-preview-target="error" class="form-errors" role="alert" hidden></ul>
+                    {{ form_widget(form.coverUrl) }}
+                </div>
+
+                {{ form_row(form.title, {attr: (book.title is empty ? {'data-autofocus': true} : {})}) }}
+                {{ form_row(form.authors) }}
+
+                {# Eigene Bewertung: 1–5 Sterne (von rechts nach links gerendert, damit CSS die Sterne davor mitfärben kann) #}
+                <fieldset class="form-row rating-input">
+                    <legend class="form-label">{{ 'book.field.rating'|trans }} <span class="disclosure-hint">– {{ 'book.form.optional'|trans }}</span></legend>
+                    <div class="rating-row">
+                        <div class="stars-input">
+                            {% for child in form.rating|reverse %}
+                                <input type="radio" id="{{ child.vars.id }}" name="{{ child.vars.full_name }}" value="{{ child.vars.value }}"{{ child.vars.checked ? ' checked' }}>
+                                <label for="{{ child.vars.id }}" title="{{ 'book.rating.stars'|trans({count: child.vars.value}) }}">{{ icon('star') }}<span class="visually-hidden">{{ 'book.rating.stars'|trans({count: child.vars.value}) }}</span></label>
+                                {% do child.setRendered() %}
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-ghost btn-sm" onclick="this.closest('fieldset').querySelectorAll('input').forEach((i) => { i.checked = false; })">{{ 'book.rating.clear'|trans }}</button>
+                    </div>
+                    {% do form.rating.setRendered() %}
+                    {{ form_errors(form.rating) }}
+                </fieldset>
+                {{ form_row(form.review) }}
+            </div>
+
+            <details class="disclosure"{{ details_have_errors ? ' open' }}>
+                <summary>
+                    <span>{{ 'book.form.more_details'|trans }} <span class="disclosure-hint">– {{ 'book.form.optional'|trans }}</span></span>
+                    {{ icon('chevron-down') }}
+                </summary>
+                <div class="disclosure-body">
+                    {{ form_row(form.awards) }}
+                    {{ form_row(form.subtitle) }}
+                    <div class="form-grid form-grid-2">
+                        {{ form_row(form.isbn) }}
+                        {{ form_row(form.publisher) }}
+                    </div>
+                    <div class="form-grid form-grid-2">
+                        {{ form_row(form.publishedYear) }}
+                        {{ form_row(form.pageCount) }}
+                    </div>
+                    {{ form_row(form.language) }}
+                    {{ form_row(form.format) }}
+                    {{ form_row(form.genres) }}
+                    {{ form_row(form.newGenre) }}
+                    <div class="form-grid form-grid-2">
+                        {{ form_row(form.series) }}
+                        {{ form_row(form.seriesNumber) }}
+                    </div>
+                    {{ form_row(form.description) }}
+                    {{ form_row(form.condition) }}
+                    {% if form.ownerNote is defined %}{{ form_row(form.ownerNote) }}{% endif %}
+                </div>
+            </details>
+
+            {% if scanMode %}<input type="hidden" name="scan" value="1">{% endif %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    {{ icon('check') }}
+                    {{ (mode == 'edit' ? 'book.form.save_changes' : (scanMode ? 'book.form.save_and_scan' : 'book.form.save'))|trans }}
+                </button>
+                {% if mode == 'edit' %}
+                    <a class="btn btn-ghost btn-block" href="{{ path('app_book_show', {id: book.id}) }}">{{ 'confirm.cancel'|trans }}</a>
+                {% endif %}
+            </div>
+
+            <datalist id="author-suggestions">
+                {% for author in authorSuggestions %}<option value="{{ author.name }}">{% endfor %}
+            </datalist>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

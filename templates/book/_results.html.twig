@@ -1,0 +1,47 @@
+{# Trefferliste – wird bei Suche/Filter per Turbo-Frame ausgetauscht, ohne die Seite neu zu laden. #}
+<turbo-frame id="book-results" target="_top" data-turbo-action="advance">
+    {% if total > 0 %}
+        <div class="result-meta">
+            <span aria-live="polite">
+                {% if filter.hasActiveFilters and totalAll is not null %}
+                    {{ 'books.count_of'|trans({count: total, total: totalAll}) }}
+                {% else %}
+                    {{ 'books.count'|trans({count: total}) }}
+                {% endif %}
+            </span>
+            <select name="sort" form="book-filter" class="select-inline" aria-label="{{ 'books.sort.label'|trans }}">
+                {% for value, label in constant('App\\Model\\BookFilter::SORTS') %}
+                    <option value="{{ value }}"{{ filter.sort == value ? ' selected' }}>{{ label|trans }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="book-grid" role="list">
+            {{ include('book/_grid_items.html.twig') }}
+        </div>
+    {% elseif not filter.hasActiveFilters %}
+        <div class="empty-state">
+            <div class="empty-state-icon">{{ icon('books') }}</div>
+            <h2>{{ 'books.empty.all_title'|trans }}</h2>
+            <p>{{ 'books.empty.all_text'|trans }}</p>
+            <a class="btn btn-primary" href="{{ path('app_book_new') }}">{{ icon('plus') }} {{ 'books.empty.all_action'|trans }}</a>
+        </div>
+    {% elseif filter.mine and filter.q == '' and filter.status is null %}
+        <div class="empty-state">
+            <div class="empty-state-icon">{{ icon('book') }}</div>
+            <h2>{{ 'books.empty.mine_title'|trans }}</h2>
+            <p>{{ 'books.empty.mine_text'|trans }}</p>
+            <a class="btn btn-primary" href="{{ path('app_book_new') }}">{{ icon('plus') }} {{ 'nav.add'|trans }}</a>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">{{ icon('search') }}</div>
+            <h2>{{ 'books.empty.search_title'|trans }}</h2>
+            <p>
+                {{ filter.q != '' ? 'books.empty.search_text_query'|trans({query: filter.q}) : 'books.empty.search_text_filter'|trans }}
+                {{ 'books.empty.search_hint'|trans }}
+            </p>
+            <a class="btn btn-secondary" href="{{ path('app_book_index') }}">{{ 'books.reset_filters'|trans }}</a>
+        </div>
+    {% endif %}
+</turbo-frame>

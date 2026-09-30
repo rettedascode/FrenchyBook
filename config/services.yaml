@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+parameters:
+    # Speicherort der Cover (relativ zu public/). Im Test-Environment wird ein eigener Ordner verwendet.
+    app.covers_public_path: 'uploads/covers'
+    app.covers_dir: '%kernel.project_dir%/public/%app.covers_public_path%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+
+when@test:
+    parameters:
+        app.covers_public_path: 'uploads/test-covers'
+    services:
+        App\Tests\Support\FakeOpenLibrary:
+            public: true

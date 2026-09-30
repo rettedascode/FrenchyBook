@@ -1,0 +1,42 @@
+# Thumbnails und Vorschaubilder für Buchcover.
+# Die Originale liegen (bereits verkleinert) unter public/uploads/covers,
+# die abgeleiteten Varianten werden beim ersten Aufruf unter public/media/cache erzeugt.
+liip_imagine:
+    driver: gd
+    twig:
+        mode: lazy
+    loaders:
+        default:
+            filesystem:
+                data_root: '%kernel.project_dir%/public'
+    resolvers:
+        default:
+            web_path:
+                web_root: '%kernel.project_dir%/public'
+                cache_prefix: media/cache
+    default_filter_set_settings:
+        format: webp
+    filter_sets:
+        cache: ~
+        # Kachel im Bücher-Grid
+        cover_thumb:
+            quality: 80
+            filters:
+                thumbnail: { size: [360, 540], mode: inset }
+        # Kleines Bild in Listen (Dashboard, Anfragen)
+        cover_mini:
+            quality: 80
+            filters:
+                thumbnail: { size: [120, 180], mode: inset }
+        # Großes Cover auf der Detailseite
+        cover_large:
+            quality: 85
+            filters:
+                thumbnail: { size: [800, 1200], mode: inset }
+        # Wird beim Upload auf das Original angewendet (dreht Handyfotos richtig und verkleinert)
+        cover_original:
+            quality: 85
+            filters:
+                auto_rotate: ~
+                strip: ~
+                thumbnail: { size: [1200, 1800], mode: inset }

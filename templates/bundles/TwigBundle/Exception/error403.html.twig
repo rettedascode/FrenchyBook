@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'error.403.title'|trans }}{% endblock %}
+
+{% block body %}
+<div class="error-page">
+    <div class="error-code">{{ icon('lock', 'icon-lg') }}</div>
+    <h1>{{ 'error.403.heading'|trans }}</h1>
+    <p class="muted">{{ 'error.403.text'|trans }}</p>
+    <a class="btn btn-primary" href="{{ path('app_book_index') }}">{{ 'error.to_books'|trans }}</a>
+</div>
+{% endblock %}

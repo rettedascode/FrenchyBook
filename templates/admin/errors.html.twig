@@ -1,0 +1,44 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin_title %}{{ 'admin.nav.errors'|trans }}{% endblock %}
+{% block admin_section %}errors{% endblock %}
+
+{% block admin_body %}
+<p class="muted">{{ 'admin.errors.intro'|trans({days: days}) }}</p>
+
+{% if groups is empty %}
+    <div class="empty-state">
+        <div class="empty-state-icon">{{ icon('check') }}</div>
+        <h2>{{ 'admin.errors.empty_title'|trans }}</h2>
+        <p>{{ 'admin.errors.empty_text'|trans({days: days}) }}</p>
+    </div>
+{% else %}
+    <ul class="admin-errors">
+        {% for g in groups %}
+            <li class="card admin-error admin-error-{{ g.level }}">
+                <div class="admin-error-head">
+                    <span class="badge {{ g.level in ['critical', 'alert', 'emergency'] ? 'badge-overdue' : 'badge-lent' }}"><span>{{ g.level|upper }}</span></span>
+                    <span class="subtle">{{ g.channel }}</span>
+                    <span class="subtle admin-error-when">
+                        {{ 'admin.errors.times'|trans({count: g.count}) }} · {{ 'admin.errors.last'|trans({date: g.last|ldate('short'), time: g.last|date('H:i')}) }}
+                    </span>
+                </div>
+                <p class="admin-error-message">{{ g.message }}</p>
+                {% if g.detail %}<p class="admin-error-detail">{{ g.detail }}</p>{% endif %}
+                {% if g.where %}<p class="subtle admin-error-where">{{ g.where }}</p>{% endif %}
+                {% if g.context is not empty %}
+                    <details class="admin-inline">
+                        <summary class="btn btn-ghost btn-sm">{{ 'admin.errors.details'|trans }}</summary>
+                        <pre class="admin-pre">{{ g.context|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES')) }}</pre>
+                    </details>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <form method="post" action="{{ path('admin_errors_clear') }}" data-turbo-confirm="{{ 'admin.errors.clear_confirm'|trans }}" class="text-center">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin-errors-clear') }}">
+        <button type="submit" class="btn btn-ghost">{{ icon('trash', 'icon-sm') }} {{ 'admin.errors.clear'|trans }}</button>
+    </form>
+{% endif %}
+{% endblock %}

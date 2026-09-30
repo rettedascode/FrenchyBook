@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'nav.dashboard'|trans }}{% endblock %}
+{% block nav_section %}dashboard{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1>{{ 'dashboard.hello'|trans({name: app.user.name}) }}</h1>
+        <p class="muted" style="margin:0">
+            {% if incomingRequests is not empty %}
+                {{ 'dashboard.requests_waiting'|trans({count: incomingRequests|length}) }}
+            {% else %}
+                {{ 'dashboard.intro'|trans }}
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+{% if app.user.profileIncomplete %}
+    <div class="notice notice-warning section-notice">
+        {{ icon('map-pin') }}
+        <p><strong>{{ 'dashboard.complete_profile_title'|trans }}</strong> {{ 'dashboard.complete_profile_text'|trans }} <a href="{{ path('app_profile') }}">{{ 'dashboard.complete_profile_link'|trans }}</a></p>
+    </div>
+{% endif %}
+
+{{ include('dashboard/_getting_started.html.twig') }}
+{{ include('pwa/_install.html.twig', {banner: true}) }}
+
+{% if myBookCount == 0 %}
+    <div class="empty-state section">
+        <div class="empty-state-icon">{{ icon('book') }}</div>
+        <h2>{{ 'books.empty.mine_title'|trans }}</h2>
+        <p>{{ 'dashboard.no_books_text'|trans }}</p>
+        <a class="btn btn-primary" href="{{ path('app_book_new') }}">{{ icon('plus') }} {{ 'books.empty.all_action'|trans }}</a>
+    </div>
+{% endif %}
+
+{# 1. Offene Anfragen an mich – ganz oben #}
+{% if incomingRequests is not empty %}
+    <section class="section" aria-labelledby="h-requests">
+        <h2 class="section-title" id="h-requests">{{ icon('inbox') }} {{ 'dashboard.incoming'|trans }} <span class="count count-alert">{{ incomingRequests|length }}</span></h2>
+        <ul class="list">
+            {% for request in incomingRequests %}
+                {{ include('dashboard/_request_item.html.twig', {request: request, from: 'dashboard', book_lent: activeLoans[request.book.id] is defined}) }}
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
+
+{# 2. Bücher, die ich verliehen habe #}
+<section class="section" aria-labelledby="h-lent">
+    <h2 class="section-title" id="h-lent">{{ icon('lend') }} {{ 'dashboard.lent'|trans }} {% if lentOut is not empty %}<span class="count">{{ lentOut|length }}</span>{% endif %}</h2>
+    {% if lentOut is empty %}
+        <div class="empty-state empty-state-compact">
+            <p>{{ 'dashboard.lent_empty'|trans }}</p>
+        </div>
+    {% else %}
+        <ul class="list">
+            {% for loan in lentOut %}
+                <li class="list-item{{ loan.overdue ? ' is-overdue' }}">
+                    <a href="{{ path('app_book_show', {id: loan.book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: loan.book, size: 'mini', decorative: true}) }}</a>
+                    <div class="list-item-body">
+                        <a class="list-item-title" href="{{ path('app_book_show', {id: loan.book.id}) }}">{{ loan.book.title }}</a>
+                        <div class="list-item-meta">{{ 'dashboard.at'|trans }} <strong>{{ loan.borrower.name }}</strong> · {{ loan.lentAt|since }}</div>
+                        {% if loan.overdue %}
+                            <span class="badge badge-overdue">{{ 'loan.overdue_since'|trans({days: loan.daysOverdue}) }}</span>
+                        {% elseif loan.dueAt %}
+                            <span class="badge badge-lent">{{ 'loan.due_until'|trans({date: loan.dueAt|ldate('short')}) }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="list-item-actions">
+                        <form method="post" action="{{ path('app_loan_return', {id: loan.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('return-loan-' ~ loan.id) }}">
+                            <input type="hidden" name="from" value="dashboard">
+                            <button type="submit" class="btn btn-secondary btn-sm">{{ icon('return', 'icon-sm') }} {{ 'dashboard.is_back'|trans }}</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+
+{# 3. Bücher, die ich mir geliehen habe #}
+<section class="section" aria-labelledby="h-borrowed">
+    <h2 class="section-title" id="h-borrowed">{{ icon('book') }} {{ 'dashboard.borrowed'|trans }} {% if borrowed is not empty %}<span class="count">{{ borrowed|length }}</span>{% endif %}</h2>
+    {% if borrowed is empty %}
+        <div class="empty-state empty-state-compact">
+            <p>{{ 'dashboard.borrowed_empty'|trans }}</p>
+            <a class="btn btn-secondary btn-sm" href="{{ path('app_book_index', {status: 'available'}) }}">{{ 'dashboard.browse_available'|trans }}</a>
+        </div>
+    {% else %}
+        <ul class="list">
+            {% for loan in borrowed %}
+                <li class="list-item{{ loan.overdue ? ' is-overdue' }}">
+                    <a href="{{ path('app_book_show', {id: loan.book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: loan.book, size: 'mini', decorative: true}) }}</a>
+                    <div class="list-item-body">
+                        <a class="list-item-title" href="{{ path('app_book_show', {id: loan.book.id}) }}">{{ loan.book.title }}</a>
+                        <div class="list-item-meta">{{ 'dashboard.from'|trans }} <strong>{{ loan.book.owner.name }}</strong> · {{ loan.lentAt|since }}</div>
+                        {% if loan.overdue %}
+                            <span class="badge badge-overdue">{{ 'loan.should_be_back'|trans({date: loan.dueAt|ldate('short')}) }}</span>
+                        {% elseif loan.dueAt %}
+                            <span class="badge badge-lent">{{ 'loan.due_until'|trans({date: loan.dueAt|ldate('short')}) }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+
+{# Meine Plätze auf Wartelisten #}
+{% if waitlist is not empty %}
+    <section class="section" aria-labelledby="h-waitlist">
+        <h2 class="section-title" id="h-waitlist">{{ icon('users') }} {{ 'dashboard.waitlist'|trans }} <span class="count">{{ waitlist|length }}</span></h2>
+        <ul class="list">
+            {% for entry in waitlist %}
+                <li class="list-item">
+                    <a href="{{ path('app_book_show', {id: entry.book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: entry.book, size: 'mini', decorative: true}) }}</a>
+                    <div class="list-item-body">
+                        <a class="list-item-title" href="{{ path('app_book_show', {id: entry.book.id}) }}">{{ entry.book.title }}</a>
+                        <div class="list-item-meta">
+                            {% if entry.book.available %}{{ 'dashboard.waitlist_available'|trans({name: entry.book.owner.name}) }}{% else %}{{ 'waitlist.your_position'|trans({position: entry.book.waitlistPosition(app.user)}) }}{% endif %}
+                        </div>
+                    </div>
+                    <div class="list-item-actions">
+                        <form method="post" action="{{ path('app_waitlist_leave', {id: entry.book.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('waitlist-' ~ entry.book.id) }}">
+                            <input type="hidden" name="from" value="dashboard">
+                            <button type="submit" class="btn btn-ghost btn-sm">{{ 'waitlist.leave_short'|trans }}</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
+
+{# 4. Meine eigenen offenen Anfragen #}
+{% if myRequests is not empty %}
+    <section class="section" aria-labelledby="h-my-requests">
+        <h2 class="section-title" id="h-my-requests">{{ icon('send') }} {{ 'dashboard.my_requests'|trans }} <span class="count">{{ myRequests|length }}</span></h2>
+        <ul class="list">
+            {% for request in myRequests %}
+                <li class="list-item">
+                    <a href="{{ path('app_book_show', {id: request.book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: request.book, size: 'mini', decorative: true}) }}</a>
+                    <div class="list-item-body">
+                        <a class="list-item-title" href="{{ path('app_book_show', {id: request.book.id}) }}">{{ request.book.title }}</a>
+                        <div class="list-item-meta">{{ 'dashboard.requested_at'|trans({when: request.createdAt|relative_date}) }} <strong>{{ request.book.owner.name }}</strong></div>
+                    </div>
+                    <div class="list-item-actions">
+                        <form method="post" action="{{ path('app_request_cancel', {id: request.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('cancel-request-' ~ request.id) }}">
+                            <input type="hidden" name="from" value="dashboard">
+                            <button type="submit" class="btn btn-ghost btn-sm">{{ 'request.cancel_short'|trans }}</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
+{% endblock %}

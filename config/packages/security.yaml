@@ -1,0 +1,66 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    providers:
+        # Anmeldung mit dem Benutzernamen (UserRepository::loadUserByIdentifier, Groß-/Kleinschreibung egal)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+
+    # Admins dürfen alles, was Mitglieder dürfen – plus die Verwaltung unter /admin
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+
+    firewalls:
+        dev:
+            pattern: ^/(_profiler|_wdt|assets|build)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                default_target_path: app_dashboard
+                enable_csrf: true
+                username_parameter: username
+                password_parameter: password
+            logout:
+                path: app_logout
+                target: app_login
+                enable_csrf: true
+            # „Angemeldet bleiben“ – ein Jahr lang, damit man sich am Handy nicht ständig neu einloggen muss
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 31536000
+                path: /
+                samesite: lax
+                signature_properties: ['password']
+            # Schützt vor Passwort-Raten: max. 5 Versuche pro Minute
+            login_throttling:
+                max_attempts: 5
+                interval: '1 minute'
+
+    # Nur Login, Registrierung und die öffentlichen Bild-Varianten sind ohne Anmeldung erreichbar.
+    access_control:
+        - { path: ^/(anmelden|registrieren)$, roles: PUBLIC_ACCESS }
+        - { path: ^/sprache/, roles: PUBLIC_ACCESS }
+        - { path: ^/passwort-(vergessen|neu), roles: PUBLIC_ACCESS }
+        - { path: ^/manifest\.webmanifest$, roles: PUBLIC_ACCESS }
+        - { path: ^/hilfe$, roles: PUBLIC_ACCESS }
+        - { path: ^/media/cache, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/, roles: ROLE_USER }
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10
+        firewalls:
+            main:
+                login_throttling: null

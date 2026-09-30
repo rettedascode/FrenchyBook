@@ -1,0 +1,50 @@
+{#
+    „FrenchyBook als App installieren“
+    Parameter: banner (true = wegklickbares Banner, nur sichtbar wenn Installation möglich)
+#}
+{% set banner = banner ?? false %}
+<div class="install-card{{ banner ? ' install-banner' }}" data-controller="pwa-install" data-pwa-install-banner-value="{{ banner ? 'true' : 'false' }}"{{ banner ? ' hidden' }}>
+    {# Android / Chrome / Edge: echter Installations-Button #}
+    <div class="install-row" data-pwa-install-target="android" hidden>
+        <span class="install-icon" aria-hidden="true">{{ icon('smartphone') }}</span>
+        <div class="install-text">
+            <strong>{{ 'pwa.install.title'|trans }}</strong>
+            <p>{{ (banner ? 'pwa.install.banner_text' : 'pwa.install.text')|trans }}</p>
+        </div>
+        <div class="install-actions">
+            <button type="button" class="btn btn-primary btn-sm" data-action="pwa-install#install">{{ icon('download', 'icon-sm') }} {{ 'pwa.install.button'|trans }}</button>
+            {% if banner %}<button type="button" class="btn btn-ghost btn-sm" data-action="pwa-install#dismiss">{{ 'pwa.install.dismiss'|trans }}</button>{% endif %}
+        </div>
+    </div>
+
+    {# iPhone / iPad: Apple erlaubt keinen Button – kurze Anleitung #}
+    <div data-pwa-install-target="ios" hidden>
+        <div class="install-row">
+            <span class="install-icon" aria-hidden="true">{{ icon('smartphone') }}</span>
+            <div class="install-text">
+                <strong>{{ 'pwa.install.ios_title'|trans }}</strong>
+                {% if banner %}<p>{{ 'pwa.install.banner_text'|trans }}</p>{% endif %}
+            </div>
+            {% if banner %}<div class="install-actions"><button type="button" class="btn btn-ghost btn-sm" data-action="pwa-install#dismiss">{{ 'pwa.install.dismiss'|trans }}</button></div>{% endif %}
+        </div>
+        <ol class="install-steps">
+            <li><span class="step-icon">{{ icon('share', 'icon-sm') }}</span> {{ 'pwa.install.ios_step1'|trans }}</li>
+            <li><span class="step-icon">{{ icon('plus-square', 'icon-sm') }}</span> {{ 'pwa.install.ios_step2'|trans }}</li>
+            <li><span class="step-icon">{{ icon('check', 'icon-sm') }}</span> {{ 'pwa.install.ios_step3'|trans }}</li>
+        </ol>
+    </div>
+
+    {% if not banner %}
+        <div class="install-row" data-pwa-install-target="installed" hidden>
+            <span class="install-icon install-icon-ok" aria-hidden="true">{{ icon('check') }}</span>
+            <div class="install-text"><strong>{{ 'pwa.install.installed'|trans }}</strong></div>
+        </div>
+        <div class="install-row" data-pwa-install-target="other" hidden>
+            <span class="install-icon" aria-hidden="true">{{ icon('smartphone') }}</span>
+            <div class="install-text">
+                <strong>{{ 'pwa.install.title'|trans }}</strong>
+                <p>{{ 'pwa.install.other'|trans }}</p>
+            </div>
+        </div>
+    {% endif %}
+</div>

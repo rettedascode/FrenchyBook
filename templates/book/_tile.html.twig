@@ -1,0 +1,16 @@
+<div class="book-tile" role="listitem">
+    <a href="{{ path('app_book_show', {id: book.id}) }}">
+        {{ include('book/_cover.html.twig', {book: book, decorative: true, eager: eager ?? false}) }}
+        <div class="book-tile-title">{{ book.title }}</div>
+        {% if book.authorNames %}<div class="book-tile-author">{{ book.authorNames }}</div>{% endif %}
+        {% set tile_loan = activeLoans[book.id] ?? null %}
+        {% set tile_district = tile_loan ? tile_loan.borrower.district : book.owner.district %}
+        {% if book.rating or tile_district %}
+            <div class="book-tile-meta">
+                {% if book.rating %}{{ include('book/_stars.html.twig', {rating: book.rating}) }}{% endif %}
+                {% if tile_district %}<span class="book-tile-district">{{ icon('map-pin') }}{{ tile_district|trans }}</span>{% endif %}
+            </div>
+        {% endif %}
+        {{ include('book/_status_badge.html.twig', {loan: tile_loan}) }}
+    </a>
+</div>

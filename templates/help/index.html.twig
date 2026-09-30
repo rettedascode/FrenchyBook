@@ -1,0 +1,199 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'help.title'|trans }}{% endblock %}
+{% block nav_section %}{% endblock %}
+
+{#
+    Nachbau eines Buttons aus der App – damit man genau sieht, was man antippen muss.
+    Die Texte kommen aus denselben Übersetzungen wie die echten Buttons.
+#}
+{% macro ui(ui) %}
+    {%- if ui.badge is defined -%}
+        <span class="badge badge-{{ ui.badge }}"><span>{{ ui.label|trans(ui.params ?? {}) }}</span></span>
+    {%- elseif ui.style == 'chip' -%}
+        <span class="chip ui-sample">{% if ui.icon is defined %}{{ icon(ui.icon) }}{% endif %}{{ ui.label|trans }}</span>
+    {%- elseif ui.style == 'nav' -%}
+        <span class="ui-sample ui-nav">{{ icon(ui.icon) }}<span>{{ ui.label|trans }}</span></span>
+    {%- elseif ui.style == 'icon' -%}
+        <span class="ui-sample ui-icon-only" aria-label="{{ ui.label|trans }}">{{ icon(ui.icon) }}</span>
+    {%- else -%}
+        <span class="btn btn-{{ ui.style }} btn-sm ui-sample">{% if ui.icon is defined %}{{ icon(ui.icon, 'icon-sm') }}{% endif %}{{ ui.label|trans }}</span>
+    {%- endif -%}
+{% endmacro %}
+
+{% macro steps(steps) %}
+    <ol class="help-steps">
+        {% for step in steps %}
+            <li>
+                <p>{{ step.text|trans }}</p>
+                {% if step.ui is defined %}
+                    <div class="help-ui">
+                        {% for ui in (step.ui.label is defined or step.ui.badge is defined ? [step.ui] : step.ui) %}{{ _self.ui(ui) }}{% endfor %}
+                    </div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+{% endmacro %}
+
+{% block body %}
+{% set topics = [
+    { id: 'app', key: 'app', icon: 'smartphone', groups: [
+        { title: 'help.app.android_title', steps: [
+            { text: 'help.app.android_1' },
+            { text: 'help.app.android_2', ui: { icon: 'download', label: 'pwa.install.button', style: 'primary' } },
+            { text: 'help.app.android_3' },
+        ], hint: 'help.app.android_hint' },
+        { title: 'help.app.ios_title', steps: [
+            { text: 'help.app.ios_1' },
+            { text: 'help.app.ios_2', ui: { icon: 'share', label: 'help.share', style: 'icon' } },
+            { text: 'help.app.ios_3', ui: { icon: 'plus-square', label: 'help.app.ios_home', style: 'chip' } },
+            { text: 'help.app.ios_4' },
+        ] },
+    ] },
+    { id: 'buch-hinzufuegen', key: 'add', icon: 'plus', groups: [
+        { title: 'help.add.scan_title', steps: [
+            { text: 'help.add.scan_1', ui: { icon: 'plus', label: 'nav.add_short', style: 'nav' } },
+            { text: 'help.add.scan_2', ui: { icon: 'scan', label: 'scanner.button', style: 'primary' } },
+            { text: 'help.add.scan_3' },
+            { text: 'help.add.scan_4', ui: { icon: 'check', label: 'book.form.save', style: 'primary' } },
+        ], hint: 'help.add.scan_hint' },
+        { title: 'help.add.manual_title', steps: [
+            { text: 'help.add.manual_1', ui: { icon: 'pencil', label: 'isbn.manual', style: 'secondary' } },
+            { text: 'help.add.manual_2', ui: { icon: 'camera', label: 'cover.take_photo', style: 'primary' } },
+            { text: 'help.add.manual_3' },
+        ] },
+    ] },
+    { id: 'finden', key: 'find', icon: 'search', groups: [
+        { steps: [
+            { text: 'help.find.step_1', ui: { icon: 'books', label: 'nav.books', style: 'nav' } },
+            { text: 'help.find.step_2' },
+            { text: 'help.find.step_3', ui: [
+                { label: 'books.filter.available', style: 'chip' },
+                { label: 'books.filter.mine', style: 'chip' },
+                { icon: 'filter', label: 'books.filter.more', style: 'chip' },
+            ] },
+        ] },
+    ], legend: true },
+    { id: 'ausleihen', key: 'borrow', icon: 'send', groups: [
+        { steps: [
+            { text: 'help.borrow.step_1', ui: { badge: 'available', label: 'status.pickup' } },
+            { text: 'help.borrow.step_2', ui: { icon: 'send', label: 'request.button', style: 'primary' } },
+            { text: 'help.borrow.step_3' },
+            { text: 'help.borrow.step_4' },
+        ] },
+    ] },
+    { id: 'anfragen', key: 'requests', icon: 'inbox', groups: [
+        { steps: [
+            { text: 'help.requests.step_1', ui: { icon: 'home', label: 'nav.dashboard_short', style: 'nav' } },
+            { text: 'help.requests.step_2', ui: { icon: 'check', label: 'request.accept', style: 'success' } },
+            { text: 'help.requests.step_3', ui: { icon: 'x', label: 'request.decline', style: 'secondary' } },
+        ] },
+    ] },
+    { id: 'verleihen', key: 'lend', icon: 'lend', groups: [
+        { steps: [
+            { text: 'help.lend.step_1', ui: { icon: 'lend', label: 'lend.button', style: 'primary' } },
+            { text: 'help.lend.step_2', ui: { label: 'lend.two_weeks', style: 'chip' } },
+            { text: 'help.lend.step_3', ui: { icon: 'return', label: 'loan.mark_returned', style: 'primary' } },
+        ], hint: 'help.lend.hint' },
+    ] },
+    { id: 'benachrichtigungen', key: 'notifications', icon: 'bell', groups: [
+        { steps: [
+            { text: 'help.notifications.step_1', ui: { icon: 'user', label: 'nav.profile', style: 'nav' } },
+            { text: 'help.notifications.step_2', ui: { icon: 'bell', label: 'pwa.push.enable', style: 'primary' } },
+            { text: 'help.notifications.step_3' },
+        ], hint: 'help.notifications.ios_hint' },
+    ] },
+] %}
+{% set faq = ['camera', 'scan', 'mail', 'login', 'edit', 'lost'] %}
+
+<div class="help-page" data-controller="help">
+    <header class="help-head">
+        <span class="help-head-icon" aria-hidden="true">{{ icon('help') }}</span>
+        <h1>{{ 'help.title'|trans }}</h1>
+        <p>{{ 'help.intro'|trans }}</p>
+    </header>
+
+    <nav class="help-toc" aria-label="{{ 'help.toc'|trans }}">
+        {% for topic in topics %}
+            <a class="help-toc-item" href="#{{ topic.id }}" data-action="help#open">{{ icon(topic.icon) }}<span>{{ ('help.' ~ topic.key ~ '.title')|trans }}</span></a>
+        {% endfor %}
+        <a class="help-toc-item" href="#konto" data-action="help#open">{{ icon('lock') }}<span>{{ 'help.account.title'|trans }}</span></a>
+        <a class="help-toc-item help-toc-problems" href="#probleme" data-action="help#open">{{ icon('alert') }}<span>{{ 'help.problems.title'|trans }}</span></a>
+    </nav>
+
+    <div class="help-topics">
+        {% for topic in topics %}
+            <details class="help-topic" id="{{ topic.id }}">
+                <summary>
+                    <span class="help-topic-icon" aria-hidden="true">{{ icon(topic.icon) }}</span>
+                    <span class="help-topic-text">
+                        <strong>{{ ('help.' ~ topic.key ~ '.title')|trans }}</strong>
+                        <span>{{ ('help.' ~ topic.key ~ '.summary')|trans }}</span>
+                    </span>
+                    {{ icon('chevron-down', 'help-chevron') }}
+                </summary>
+                <div class="help-topic-body">
+                    {% for group in topic.groups %}
+                        {% if group.title is defined %}<h3>{{ group.title|trans }}</h3>{% endif %}
+                        {{ _self.steps(group.steps) }}
+                        {% if group.hint is defined %}
+                            <div class="notice">{{ icon('sparkles') }}<p>{{ group.hint|trans }}</p></div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if topic.legend ?? false %}
+                        <h3>{{ 'help.find.legend_title'|trans }}</h3>
+                        <dl class="help-legend">
+                            <div><dt>{{ _self.ui({ badge: 'available', label: 'status.pickup' }) }}</dt><dd>{{ 'help.find.legend_available'|trans }}</dd></div>
+                            <div><dt>{{ _self.ui({ badge: 'lent', label: 'status.on_loan' }) }}</dt><dd>{{ 'help.find.legend_lent'|trans }}</dd></div>
+                            <div><dt>{{ _self.ui({ badge: 'overdue', label: 'status.due' }) }}</dt><dd>{{ 'help.find.legend_overdue'|trans }}</dd></div>
+                        </dl>
+                    {% endif %}
+                </div>
+            </details>
+        {% endfor %}
+
+        {# Anmelden, Passwort & Sprache #}
+        <details class="help-topic" id="konto">
+            <summary>
+                <span class="help-topic-icon" aria-hidden="true">{{ icon('lock') }}</span>
+                <span class="help-topic-text"><strong>{{ 'help.account.title'|trans }}</strong><span>{{ 'help.account.summary'|trans }}</span></span>
+                {{ icon('chevron-down', 'help-chevron') }}
+            </summary>
+            <div class="help-topic-body">
+                <ul class="help-facts">
+                    <li>{{ icon('user') }}<p>{{ 'help.account.login'|trans }}</p></li>
+                    <li>{{ icon('lock') }}<p>{{ 'help.account.forgot'|trans }}{% if app.user is null %} <a href="{{ path('app_forgot_password') }}">{{ 'login.forgot_password'|trans }}</a>{% endif %}</p></li>
+                    <li>{{ flag(app.request.locale) }}<p>{{ 'help.account.language'|trans }}</p></li>
+                    <li>{{ icon('pencil') }}<p>{{ 'help.account.profile'|trans }}</p></li>
+                </ul>
+            </div>
+        </details>
+
+        {# Wenn etwas nicht klappt #}
+        <details class="help-topic help-topic-problems" id="probleme">
+            <summary>
+                <span class="help-topic-icon" aria-hidden="true">{{ icon('alert') }}</span>
+                <span class="help-topic-text"><strong>{{ 'help.problems.title'|trans }}</strong><span>{{ 'help.problems.summary'|trans }}</span></span>
+                {{ icon('chevron-down', 'help-chevron') }}
+            </summary>
+            <div class="help-topic-body">
+                <dl class="help-faq">
+                    {% for q in faq %}
+                        <div>
+                            <dt>{{ ('help.problems.' ~ q ~ '_q')|trans }}</dt>
+                            <dd>{{ ('help.problems.' ~ q ~ '_a')|trans }}</dd>
+                        </div>
+                    {% endfor %}
+                </dl>
+            </div>
+        </details>
+    </div>
+
+    <div class="notice help-footer">
+        {{ icon('users') }}
+        <p><strong>{{ 'help.still_stuck'|trans }}</strong> {{ 'help.still_stuck_text'|trans }}</p>
+    </div>
+    <p class="text-center"><a class="btn btn-ghost btn-sm" href="#" data-action="help#top">{{ 'help.back_to_top'|trans }}</a></p>
+</div>
+{% endblock %}

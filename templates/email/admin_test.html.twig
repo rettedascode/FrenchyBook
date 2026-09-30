@@ -1,0 +1,6 @@
+{% extends 'email/_layout.html.twig' %}
+{% block content %}
+    <p style="margin:0 0 16px;">{{ 'admin.test_mail.text'|trans({name: recipient.name}) }}</p>
+    <p style="margin:0;color:#5f636b;font-size:14px;">{{ 'admin.test_mail.sent_at'|trans({date: sentAt|ldate, time: sentAt|date('H:i')}) }}</p>
+    {{ include('email/_button.html.twig', {url: url('admin_dashboard'), label: 'admin.test_mail.button_open'|trans}) }}
+{% endblock %}

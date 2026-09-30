@@ -1,0 +1,6 @@
+{% extends 'email/_layout.html.twig' %}
+{% block content %}
+    <p style="margin:0 0 16px;">{{ 'email.waitlist_available.text'|trans({title: book.title, name: book.owner.name}) }}</p>
+    <p style="margin:0;">{{ 'email.waitlist_available.hint'|trans }}</p>
+    {{ include('email/_button.html.twig', {url: url('app_book_show', {id: book.id}), label: 'email.waitlist_available.button'|trans}) }}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'email/_layout.html.twig' %}
+{% block content %}
+    <p style="margin:0 0 16px;">{{ 'email.request_created.text'|trans({name: request.requester.name, title: book.title}) }}</p>
+    {% if request.message %}
+        <p style="margin:0 0 16px;padding:12px 16px;background:#f0efeb;border-radius:10px;font-style:italic;">„{{ request.message }}“</p>
+    {% endif %}
+    <p style="margin:0;">{{ 'email.request_created.action_text'|trans }}</p>
+    {{ include('email/_button.html.twig', {url: url('app_dashboard'), label: 'email.request_created.button'|trans}) }}
+{% endblock %}

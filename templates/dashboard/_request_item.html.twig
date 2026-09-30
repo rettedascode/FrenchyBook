@@ -1,0 +1,35 @@
+{# Eingehende Anfrage mit Annehmen/Ablehnen. Parameter: request, from ('dashboard'|'book'), show_cover, book_lent #}
+{% set book = request.book %}
+{% set book_lent = book_lent ?? (book.activeLoan is not null) %}
+<li class="list-item"{% if not (show_cover ?? true) %} style="grid-template-columns: 40px 1fr"{% endif %}>
+    {% if show_cover ?? true %}
+        <a href="{{ path('app_book_show', {id: book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: book, size: 'mini', decorative: true}) }}</a>
+    {% else %}
+        <span class="avatar" style="--av: {{ avatar_color(request.requester) }}" aria-hidden="true">{{ request.requester.initial }}</span>
+    {% endif %}
+    <div class="list-item-body">
+        {% if show_cover ?? true %}
+            <a class="list-item-title" href="{{ path('app_book_show', {id: book.id}) }}">{{ book.title }}</a>
+            <div class="list-item-meta"><strong>{{ request.requester.name }}</strong> {{ 'request.wants_it'|trans }} · {{ request.createdAt|relative_date }}</div>
+        {% else %}
+            <div class="list-item-title">{{ request.requester.name }}</div>
+            <div class="list-item-meta">{{ 'request.wants_it'|trans }} · {{ request.createdAt|relative_date }}</div>
+        {% endif %}
+        {% if request.message %}<p class="request-message">„{{ request.message }}“</p>{% endif %}
+        {% if book_lent %}<p class="subtle" style="margin: 6px 0 0">{{ 'request.book_lent_hint'|trans }}</p>{% endif %}
+    </div>
+    <div class="list-item-actions">
+        {% if not book_lent %}
+            <form method="post" action="{{ path('app_request_accept', {id: request.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('respond-request-' ~ request.id) }}">
+                <input type="hidden" name="from" value="{{ from }}">
+                <button type="submit" class="btn btn-success btn-sm" title="{{ 'request.accept_hint'|trans }}">{{ icon('check', 'icon-sm') }} {{ 'request.accept'|trans }}</button>
+            </form>
+        {% endif %}
+        <form method="post" action="{{ path('app_request_decline', {id: request.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('respond-request-' ~ request.id) }}">
+            <input type="hidden" name="from" value="{{ from }}">
+            <button type="submit" class="btn btn-secondary btn-sm">{{ icon('x', 'icon-sm') }} {{ 'request.decline'|trans }}</button>
+        </form>
+    </div>
+</li>

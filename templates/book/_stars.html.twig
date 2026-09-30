@@ -1,0 +1,4 @@
+{# Bewertung als 1–5 Sterne. Parameter: rating #}
+<span class="stars" role="img" aria-label="{{ 'book.rating.stars'|trans({count: rating}) }}">
+    {%- for i in 1..5 -%}<span class="star{{ i <= rating ? ' is-on' }}">{{ icon('star') }}</span>{%- endfor -%}
+</span>

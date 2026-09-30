@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'reset.request.title'|trans }}{% endblock %}
+
+{% block body %}
+<div class="auth">
+    <div class="auth-hero">
+        <div class="logo-mark">{{ icon('lock') }}</div>
+        <h1>{{ 'reset.request.title'|trans }}</h1>
+        <p>{{ 'reset.request.intro'|trans }}</p>
+    </div>
+
+    <div class="card">
+        {{ form_start(form, {attr: {class: 'form', novalidate: 'novalidate'}}) }}
+            {{ form_errors(form) }}
+            {{ form_row(form.email) }}
+            <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('send') }} {{ 'reset.request.submit'|trans }}</button>
+        {{ form_end(form) }}
+    </div>
+
+    <p class="auth-switch"><a href="{{ path('app_login') }}">{{ icon('arrow-left', 'icon-sm') }} {{ 'reset.back_to_login'|trans }}</a></p>
+</div>
+{% endblock %}

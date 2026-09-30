@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'nav.books'|trans }}{% endblock %}
+{% block nav_section %}books{% endblock %}
+
+{% macro chip_radio(name, value, label, current) %}
+    {%- set id = 'f-' ~ name ~ '-' ~ (value is same as('') ? 'all' : value|lower|replace({' ': '-'})) -%}
+    <span class="chip-choice">
+        <input type="radio" id="{{ id }}" name="{{ name }}" value="{{ value }}"{{ (current ?? '')|lower == value|lower ? ' checked' }}>
+        <label for="{{ id }}" class="chip">{{ label }}</label>
+    </span>
+{% endmacro %}
+
+{% block body %}
+<div class="page-header">
+    <h1>{{ 'nav.books'|trans }}</h1>
+</div>
+
+{% set all = 'books.filter.all'|trans %}
+<div data-controller="autosubmit toggle" data-action="change->autosubmit#submit">
+    <form id="book-filter" method="get" action="{{ path('app_book_index') }}" role="search"
+          data-autosubmit-target="form" data-turbo-frame="book-results">
+
+        <div class="search">
+            {{ icon('search') }}
+            <label for="q" class="visually-hidden">{{ 'books.search_label'|trans }}</label>
+            <input type="search" id="q" name="q" value="{{ filter.q }}" placeholder="{{ 'books.search_placeholder'|trans }}"
+                   autocomplete="off" enterkeyhint="search" data-action="input->autosubmit#search">
+        </div>
+
+        <div class="filter-bar">
+            <div class="chips" role="group" aria-label="{{ 'books.filter.status_label'|trans }}">
+                {{ _self.chip_radio('status', '', all, filter.status) }}
+                {{ _self.chip_radio('status', 'available', 'books.filter.available'|trans, filter.status) }}
+                {{ _self.chip_radio('status', 'lent', 'books.filter.lent'|trans, filter.status) }}
+                <span class="chip-choice">
+                    <input type="checkbox" id="f-mine" name="mine" value="1"{{ filter.mine ? ' checked' }}>
+                    <label for="f-mine" class="chip">{{ 'books.filter.mine'|trans }}</label>
+                </span>
+                {% set detail_count = filter.countDetailFilters %}
+                <button type="button" class="chip{{ detail_count ? ' is-active' }}" data-action="toggle#toggle"
+                        data-toggle-target="button" aria-expanded="{{ detail_count ? 'true' : 'false' }}" aria-controls="filter-panel">
+                    {{ icon('filter') }} {{ 'books.filter.more'|trans }}{% if detail_count %} ({{ detail_count }}){% endif %}
+                </button>
+            </div>
+
+            {% if activeAuthor %}
+                <div class="chips">
+                    <input type="hidden" name="author" value="{{ activeAuthor.id }}">
+                    <a class="chip is-active" href="{{ path('app_book_index', filter.with('author', null)) }}" aria-label="{{ 'books.filter.author_remove'|trans({name: activeAuthor.name}) }}">
+                        {{ 'books.filter.author'|trans({name: activeAuthor.name}) }} {{ icon('x') }}
+                    </a>
+                </div>
+            {% endif %}
+
+            <div class="filter-panel" id="filter-panel" data-toggle-target="panel"{{ detail_count ? '' : ' hidden' }}>
+                {% if genres is not empty %}
+                    <h3 id="f-genre-label">{{ 'books.filter.genre'|trans }}</h3>
+                    <div class="chips" role="group" aria-labelledby="f-genre-label">
+                        {{ _self.chip_radio('genre', '', all, filter.genre) }}
+                        {% for genre in genres|sort((a, b) => a.name|genre_name <=> b.name|genre_name) %}{{ _self.chip_radio('genre', genre.id, genre.name|genre_name, filter.genre) }}{% endfor %}
+                    </div>
+                {% endif %}
+                {% if languages is not empty %}
+                    <h3 id="f-language-label">{{ 'books.filter.language'|trans }}</h3>
+                    <div class="chips" role="group" aria-labelledby="f-language-label">
+                        {{ _self.chip_radio('language', '', all, filter.language) }}
+                        {% for language in languages %}{{ _self.chip_radio('language', language, language|language_name, filter.language) }}{% endfor %}
+                    </div>
+                {% endif %}
+                {% if formats is not empty %}
+                    <h3 id="f-format-label">{{ 'books.filter.format'|trans }}</h3>
+                    <div class="chips" role="group" aria-labelledby="f-format-label">
+                        {{ _self.chip_radio('format', '', all, filter.format.value ?? '') }}
+                        {% for format in formats %}{{ _self.chip_radio('format', format.value, format|trans, filter.format.value ?? '') }}{% endfor %}
+                    </div>
+                {% endif %}
+                {% if owners|length > 1 %}
+                    <h3 id="f-owner-label">{{ 'books.filter.owner'|trans }}</h3>
+                    <div class="chips" role="group" aria-labelledby="f-owner-label">
+                        {{ _self.chip_radio('owner', '', all, filter.owner) }}
+                        {% for owner in owners %}{{ _self.chip_radio('owner', owner.id, owner.id == app.user.id ? 'books.filter.me'|trans : owner.name, filter.owner) }}{% endfor %}
+                    </div>
+                {% endif %}
+                {% if genres is empty and languages is empty and formats is empty and owners|length <= 1 %}
+                    <p class="subtle" style="margin:0">{{ 'books.filter.empty'|trans }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <noscript><button type="submit" class="btn btn-secondary">{{ 'books.search_submit'|trans }}</button></noscript>
+    </form>
+
+    {{ include('book/_results.html.twig') }}
+</div>
+{% endblock %}

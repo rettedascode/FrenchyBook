@@ -1,0 +1,6 @@
+{% extends 'email/_layout.html.twig' %}
+{% block content %}
+    <p style="margin:0 0 16px;">{{ 'email.request_declined.text'|trans({name: book.owner.name, title: book.title}) }}</p>
+    <p style="margin:0;">{{ 'email.request_declined.hint'|trans }}</p>
+    {{ include('email/_button.html.twig', {url: url('app_book_index', {status: 'available'}), label: 'email.request_declined.button'|trans}) }}
+{% endblock %}

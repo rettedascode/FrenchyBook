@@ -1,0 +1,70 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin_title %}{{ 'admin.nav.loans'|trans }}{% endblock %}
+{% block admin_section %}loans{% endblock %}
+
+{% block admin_body %}
+<p class="muted">{{ 'admin.loans.intro'|trans }}</p>
+
+<section class="section" aria-labelledby="h-active">
+    <h2 class="section-title" id="h-active">{{ icon('lend') }} {{ 'admin.loans.active'|trans }} <span class="count">{{ loans|length }}</span></h2>
+    {% if loans is empty %}
+        <div class="empty-state empty-state-compact"><p>{{ 'admin.loans.active_empty'|trans }}</p></div>
+    {% else %}
+        <ul class="list">
+            {% for loan in loans %}
+                <li class="list-item{{ loan.overdue ? ' is-overdue' }}">
+                    <a href="{{ path('app_book_show', {id: loan.book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: loan.book, size: 'mini', decorative: true}) }}</a>
+                    <div class="list-item-body">
+                        <a class="list-item-title" href="{{ path('app_book_show', {id: loan.book.id}) }}">{{ loan.book.title }}</a>
+                        <div class="list-item-meta">{{ 'admin.loans.from_to'|trans({owner: loan.book.owner.name, borrower: loan.borrower.name}) }} · {{ loan.lentAt|since }}</div>
+                        {% if loan.overdue %}
+                            <span class="badge badge-overdue"><span>{{ 'loan.overdue_since'|trans({days: loan.daysOverdue}) }}</span></span>
+                        {% elseif loan.dueAt %}
+                            <span class="badge badge-lent"><span>{{ 'loan.due_until'|trans({date: loan.dueAt|ldate('short')}) }}</span></span>
+                        {% endif %}
+                    </div>
+                    <div class="admin-row-actions">
+                        <form method="post" action="{{ path('admin_loan_return', {id: loan.id}) }}"
+                              data-turbo-confirm="{{ 'admin.loans.return_confirm'|trans({title: loan.book.title, owner: loan.book.owner.name}) }}" data-confirm-button="{{ 'admin.loans.return'|trans }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin-loan-return-' ~ loan.id) }}">
+                            <button type="submit" class="btn btn-secondary btn-sm">{{ icon('return', 'icon-sm') }} {{ 'admin.loans.return'|trans }}</button>
+                        </form>
+                        <form method="post" action="{{ path('admin_loan_delete', {id: loan.id}) }}"
+                              data-turbo-confirm="{{ 'admin.loans.delete_confirm'|trans({title: loan.book.title}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin-loan-delete-' ~ loan.id) }}">
+                            <button type="submit" class="btn btn-danger-ghost btn-sm">{{ icon('trash', 'icon-sm') }} {{ 'admin.loans.delete'|trans }}</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+
+<section class="section" id="anfragen" aria-labelledby="h-requests">
+    <h2 class="section-title" id="h-requests">{{ icon('inbox') }} {{ 'admin.loans.requests'|trans }} <span class="count">{{ requests|length }}</span></h2>
+    {% if requests is empty %}
+        <div class="empty-state empty-state-compact"><p>{{ 'admin.loans.requests_empty'|trans }}</p></div>
+    {% else %}
+        <ul class="list">
+            {% for request in requests %}
+                <li class="list-item">
+                    <a href="{{ path('app_book_show', {id: request.book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: request.book, size: 'mini', decorative: true}) }}</a>
+                    <div class="list-item-body">
+                        <a class="list-item-title" href="{{ path('app_book_show', {id: request.book.id}) }}">{{ request.book.title }}</a>
+                        <div class="list-item-meta">{{ 'admin.loans.request_from'|trans({requester: request.requester.name, owner: request.book.owner.name}) }} · {{ request.createdAt|relative_date }}</div>
+                    </div>
+                    <div class="list-item-actions">
+                        <form method="post" action="{{ path('admin_request_delete', {id: request.id}) }}"
+                              data-turbo-confirm="{{ 'admin.loans.request_delete_confirm'|trans({title: request.book.title, requester: request.requester.name}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin-request-delete-' ~ request.id) }}">
+                            <button type="submit" class="btn btn-danger-ghost btn-sm">{{ icon('trash', 'icon-sm') }} {{ 'admin.loans.delete'|trans }}</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+{% endblock %}

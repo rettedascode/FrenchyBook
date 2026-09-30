@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# ============================================================================
+#  Lokale Änderungen zu GitHub hochladen und auf frenchybook.com live schalten.
+#
+#    bin/deploy              (unter Windows: in Git Bash ausführen)
+#    bin/deploy <commit>     eine bestimmte (ältere) Version live schalten
+#
+#  Voraussetzung: SSH-Zugang „frenchybook“ in ~/.ssh/config (Schlüssel-Login).
+# ============================================================================
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if [ -n "$(git status --porcelain)" ]; then
+    echo "Es gibt Änderungen, die noch nicht committet sind:"
+    git status --short
+    echo "Bitte erst committen (git add -A && git commit -m \"…\")."
+    exit 1
+fi
+
+git push --quiet origin main
+echo "Zu GitHub hochgeladen: $(git log -1 --format='%h %s')"
+ssh frenchybook frenchybook-deploy "$@"

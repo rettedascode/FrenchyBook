@@ -1,0 +1,44 @@
+{#
+    „Deine ersten Schritte“ – Checkliste für neue Mitglieder.
+    Erledigtes hakt sich von selbst ab. Verschwindet, wenn alles erledigt ist oder man „Ausblenden“ tippt.
+#}
+{% set items = [
+    { key: 'account', done: true, },
+    { key: 'app', done: false, help: 'app', device: true, url: path('app_profile') ~ '#h-app' },
+    { key: 'book', done: onboarding.book, help: 'buch-hinzufuegen', url: path('app_book_new') },
+] %}
+{% if onboarding.push is defined %}
+    {% set items = items|merge([{ key: 'push', done: onboarding.push, help: 'benachrichtigungen', url: path('app_profile') ~ '#h-app' }]) %}
+{% endif %}
+{% set items = items|merge([{ key: 'borrow', done: onboarding.borrow, help: 'ausleihen', url: path('app_book_index', {status: 'available'}) }]) %}
+
+<section class="card getting-started" data-controller="checklist" data-done-text="{{ 'onboarding.done'|trans }}" hidden aria-labelledby="h-start">
+    <div class="getting-started-head">
+        <div>
+            <h2 id="h-start">{{ 'onboarding.title'|trans }}</h2>
+            <p class="muted">{{ 'onboarding.intro'|trans }}</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="checklist#dismiss">{{ 'onboarding.dismiss'|trans }}</button>
+    </div>
+    <div class="getting-started-progress" aria-hidden="true"><span data-checklist-target="bar"></span></div>
+    <p class="subtle" data-checklist-target="progress" data-template="{{ 'onboarding.progress'|trans({done: '__DONE__', total: '__TOTAL__'}) }}"></p>
+    <ul class="getting-started-list">
+        {% for item in items %}
+            <li class="{{ item.done ? 'is-done' }}" data-checklist-target="item"{% if item.device ?? false %} data-device-check="app"{% endif %}>
+                <span class="gs-check" aria-hidden="true">{{ icon('check', 'icon-sm') }}</span>
+                <span class="gs-text">
+                    {% if item.url is defined and not item.done %}
+                        <a href="{{ item.url }}">{{ ('onboarding.' ~ item.key)|trans }}</a>
+                    {% else %}
+                        {{ ('onboarding.' ~ item.key)|trans }}
+                    {% endif %}
+                    <span class="visually-hidden gs-state">{{ (item.done ? 'onboarding.done' : 'onboarding.open')|trans }}</span>
+                    {% if item.help is defined %}
+                        <a class="gs-help" href="{{ path('app_help') }}#{{ item.help }}">{{ icon('help', 'icon-sm') }} {{ 'onboarding.show_me'|trans }}</a>
+                    {% endif %}
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+    <a class="btn btn-secondary btn-sm" href="{{ path('app_help') }}">{{ icon('help', 'icon-sm') }} {{ 'onboarding.help'|trans }}</a>
+</section>

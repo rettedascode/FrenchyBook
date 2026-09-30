@@ -1,0 +1,4 @@
+{# Folgeseite der Bücherliste – ersetzt den „lazy“ Turbo-Frame der vorherigen Seite. #}
+<turbo-frame id="books-page-{{ filter.page }}" target="_top">
+    {{ include('book/_grid_items.html.twig') }}
+</turbo-frame>

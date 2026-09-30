@@ -1,0 +1,12 @@
+twig:
+    file_name_pattern: '*.twig'
+    form_themes: ['form/theme.html.twig']
+    date:
+        format: 'd.m.Y'
+        timezone: 'Europe/Berlin'
+    globals:
+        invite_code: '%env(INVITE_CODE)%'
+
+when@test:
+    twig:
+        strict_variables: true

@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'nav.add'|trans }}{% endblock %}
+{% block nav_section %}add{% endblock %}
+
+{% block body %}
+<div class="isbn-step" data-controller="scanner" data-scanner-autostart-value="{{ scanMode ? 'true' : 'false' }}"
+     data-scanner-messages-value="{{ {
+        starting: 'scanner.starting'|trans,
+        aim: 'scanner.aim'|trans,
+        notIsbn: 'scanner.not_isbn'|trans,
+        found: 'scanner.found'|trans,
+        noCamera: 'scanner.no_camera'|trans,
+        needsHttps: 'scanner.needs_https'|trans,
+        denied: 'scanner.denied'|trans,
+        notFound: 'scanner.not_found'|trans,
+        busy: 'scanner.busy'|trans,
+        failed: 'scanner.failed'|trans,
+     }|json_encode }}">
+    <div class="page-header">
+        <div>
+            <p class="subtle" style="margin:0">{{ 'book.new.step'|trans({step: 1}) }}</p>
+            <h1>{{ 'nav.add'|trans }}</h1>
+        </div>
+    </div>
+
+    <div class="stack">
+        <div class="card stack">
+            <div data-scanner-target="scanArea">
+                <button type="button" class="btn btn-primary btn-block btn-lg" data-action="scanner#start">
+                    {{ icon('scan') }} {{ 'scanner.button'|trans }}
+                </button>
+                <p class="subtle text-center" style="margin: 8px 0 0">{{ 'scanner.hint'|trans }}</p>
+            </div>
+            <div class="notice notice-warning" data-scanner-target="unsupported" hidden>
+                {{ icon('info') }}
+                <p data-scanner-target="unsupportedText">{{ 'scanner.no_camera'|trans }}</p>
+            </div>
+
+            <div class="or-divider" data-scanner-target="divider">{{ 'isbn.or_type'|trans }}</div>
+
+            <form method="get" action="{{ path('app_book_new') }}" class="form" data-scanner-target="form" novalidate>
+                {% if scanMode %}<input type="hidden" name="scan" value="1">{% endif %}
+                <div class="form-row{{ isbnError is defined ? ' has-error' }}">
+                    <label for="isbn" class="visually-hidden">ISBN</label>
+                    <div class="isbn-input-row">
+                        <input type="text" id="isbn" name="isbn" value="{{ isbn }}" class="input"
+                               inputmode="numeric" autocomplete="off" enterkeyhint="search"
+                               placeholder="978-3-…" aria-describedby="isbn-help"
+                               {{ isbnError is defined ? 'aria-invalid="true"' }} data-scanner-target="input">
+                        <button type="submit" class="btn btn-secondary">{{ icon('search') }} {{ 'isbn.search'|trans }}</button>
+                    </div>
+                    <p class="form-help" id="isbn-help">{{ 'isbn.help'|trans }}</p>
+                    {% if isbnError is defined %}
+                        <ul class="form-errors" role="alert"><li>{{ isbnError|trans }}</li></ul>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        {% if myBookCount is defined %}<p class="text-center subtle" style="margin:0">{{ 'book.new.count'|trans({count: myBookCount, max: 20}) }}</p>{% endif %}
+        <p class="text-center small"><a href="{{ path('app_help') }}#buch-hinzufuegen">{{ icon('help', 'icon-sm') }} {{ 'help.how_does_it_work'|trans }}</a></p>
+        <a class="btn btn-ghost btn-block" href="{{ path('app_book_new', {manuell: 1}) }}">
+            {{ icon('pencil') }} {{ 'isbn.manual'|trans }}
+        </a>
+    </div>
+
+    {# Vollbild-Scanner #}
+    <div class="scanner" data-scanner-target="overlay" hidden role="dialog" aria-modal="true" aria-label="{{ 'scanner.dialog_label'|trans }}">
+        <div class="scanner-video-wrap">
+            <video data-scanner-target="video" playsinline muted autoplay></video>
+            <div class="scanner-frame" aria-hidden="true"></div>
+        </div>
+        <div class="scanner-bar">
+            <p class="scanner-status" data-scanner-target="status" aria-live="assertive">{{ 'scanner.starting'|trans }}</p>
+            <button type="button" class="btn btn-secondary btn-block" data-action="scanner#stop">{{ icon('x') }} {{ 'confirm.cancel'|trans }}</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

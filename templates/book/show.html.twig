@@ -1,0 +1,294 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+{% block nav_section %}books{% endblock %}
+
+{% block body %}
+{% set is_owner = book.isOwnedBy(app.user) %}
+{% set lent_to_me = activeLoan and activeLoan.borrower.id == app.user.id %}
+
+<a class="back-link" href="{{ path('app_book_index') }}" onclick="if (history.length > 1 && document.referrer.startsWith(location.origin)) { history.back(); return false; }">
+    {{ icon('arrow-left', 'icon-sm') }} {{ 'book.show.back'|trans }}
+</a>
+
+<article class="book-detail">
+    <div class="book-detail-aside">
+        <div class="book-detail-cover">
+            {{ include('book/_cover.html.twig', {book: book, size: 'large', eager: true}) }}
+        </div>
+    </div>
+
+    <div class="stack-lg">
+        <header class="book-detail-head">
+            <h1>{{ book.title }}</h1>
+            {% if book.subtitle %}<p class="subtitle">{{ book.subtitle }}</p>{% endif %}
+            {% if book.authors is not empty %}
+                <p class="authors">
+                    {% for author in book.authors %}
+                        <a href="{{ path('app_book_index', {author: author.id}) }}" title="{{ 'book.show.all_by_author'|trans({name: author.name}) }}">{{ author.name }}</a>{{ not loop.last ? ', ' }}
+                    {% endfor %}
+                </p>
+            {% endif %}
+            {% if book.rating %}<p class="book-rating">{{ include('book/_stars.html.twig', {rating: book.rating}) }}</p>{% endif %}
+            {{ include('book/_status_badge.html.twig', {loan: activeLoan}) }}
+        </header>
+
+        {# ---------- Hauptaktion ---------- #}
+        <section class="main-action" aria-label="{{ 'book.show.loan_section'|trans }}">
+            {% if is_owner and activeLoan is null %}
+                {# Besitzer, Buch ist da → verleihen #}
+                {% if lendForm and lendForm.borrower.vars.choices is not empty %}
+                    <details class="action-disclosure"{{ lendForm.vars.submitted ? ' open' }}>
+                        <summary class="btn btn-primary btn-block btn-lg">{{ icon('lend') }} {{ 'lend.button'|trans }}</summary>
+                        <div class="action-panel" data-controller="due-date">
+                            {{ form_start(lendForm, {attr: {class: 'form', novalidate: 'novalidate'}}) }}
+                                <h3>{{ 'lend.heading'|trans({title: book.title}) }}</h3>
+                                {{ form_row(lendForm.borrower, {label: false}) }}
+                                <div class="form-row">
+                                    {{ form_label(lendForm.dueAt) }}
+                                    <div class="chips" style="margin-bottom:4px">
+                                        <button type="button" class="chip" data-action="due-date#set" data-due-date-days-param="14">{{ 'lend.two_weeks'|trans }}</button>
+                                        <button type="button" class="chip" data-action="due-date#set" data-due-date-days-param="28">{{ 'lend.four_weeks'|trans }}</button>
+                                        <button type="button" class="chip" data-action="due-date#set" data-due-date-days-param="0">{{ 'lend.no_date'|trans }}</button>
+                                    </div>
+                                    {{ form_widget(lendForm.dueAt) }}
+                                    {{ form_errors(lendForm.dueAt) }}
+                                </div>
+                                {{ form_row(lendForm.note) }}
+                                <button type="submit" class="btn btn-primary btn-block">{{ icon('check') }} {{ 'lend.button'|trans }}</button>
+                            {{ form_end(lendForm) }}
+                        </div>
+                    </details>
+                {% else %}
+                    <div class="notice">{{ icon('users') }}<p>{{ 'lend.no_friends'|trans }}</p></div>
+                {% endif %}
+
+            {% elseif is_owner %}
+                {# Besitzer, Buch ist verliehen → Rückgabe bestätigen #}
+                <div class="card card-tight status-card">
+                    <div class="status-line">
+                        <span class="avatar" style="--av: {{ avatar_color(activeLoan.borrower) }}" aria-hidden="true">{{ activeLoan.borrower.initial }}</span>
+                        <p>
+                            <strong>{{ 'loan.at'|trans({name: activeLoan.borrower.name}) }}</strong> {{ activeLoan.lentAt|since }}<br>
+                            <span class="{{ activeLoan.overdue ? 'badge badge-overdue' : 'subtle' }}">
+                                {% if not activeLoan.dueAt %}{{ 'loan.no_due_date'|trans }}{% elseif activeLoan.overdue %}{{ 'loan.overdue_since'|trans({days: activeLoan.daysOverdue}) }}{% else %}{{ 'loan.due_until'|trans({date: activeLoan.dueAt|ldate}) }}{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    {% if activeLoan.note %}<p class="request-message" style="margin:0">{{ activeLoan.note }}</p>{% endif %}
+                    {% if book.waitlist is not empty %}
+                        <p class="subtle" style="margin:0">{{ icon('users', 'icon-sm inline-icon') }} {{ 'waitlist.owner_list'|trans({count: book.waitlist|length, names: book.waitlist|map(e => e.user.name)|join(', ')}) }}</p>
+                    {% endif %}
+                    <form method="post" action="{{ path('app_loan_return', {id: activeLoan.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('return-loan-' ~ activeLoan.id) }}">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('return') }} {{ 'loan.mark_returned'|trans }}</button>
+                    </form>
+                    <details>
+                        <summary class="btn btn-ghost btn-sm btn-block">{{ icon('calendar', 'icon-sm') }} {{ 'loan.change_due_date'|trans }}</summary>
+                        <form method="post" action="{{ path('app_loan_due_date', {id: activeLoan.id}) }}" class="form" style="margin-top: 8px">
+                            <input type="hidden" name="_token" value="{{ csrf_token('due-date-' ~ activeLoan.id) }}">
+                            <div class="form-row">
+                                <label for="due-at">{{ 'loan.due_label'|trans }}</label>
+                                <input type="date" id="due-at" name="dueAt" value="{{ activeLoan.dueAt ? activeLoan.dueAt|date('Y-m-d') }}" min="{{ 'today'|date('Y-m-d') }}">
+                                <p class="form-help">{{ 'loan.due_empty_hint'|trans }}</p>
+                            </div>
+                            <button type="submit" class="btn btn-secondary btn-block">{{ 'loan.save_due_date'|trans }}</button>
+                        </form>
+                    </details>
+                </div>
+
+            {% elseif lent_to_me %}
+                <div class="card card-tight status-card">
+                    <div class="status-line">
+                        <span class="avatar" style="--av: {{ avatar_color(book.owner) }}" aria-hidden="true">{{ book.owner.initial }}</span>
+                        <p><strong>{{ 'loan.you_have_it'|trans }}</strong> {{ activeLoan.lentAt|since }}<br>
+                            <span class="{{ activeLoan.overdue ? 'badge badge-overdue' : 'subtle' }}">
+                                {% if not activeLoan.dueAt %}{{ 'loan.no_due_date_agreed'|trans }}{% elseif activeLoan.overdue %}{{ 'loan.should_be_back'|trans({date: activeLoan.dueAt|ldate}) }}{% else %}{{ 'loan.due_until'|trans({date: activeLoan.dueAt|ldate}) }}{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    <p class="subtle" style="margin:0">{{ 'loan.return_hint'|trans({name: book.owner.name}) }}</p>
+                    {% if book.waitlist is not empty %}
+                        <div class="notice notice-warning">{{ icon('users') }}<p>{{ 'loan.extend_waitlist'|trans({count: book.waitlist|length}) }}</p></div>
+                    {% elseif activeLoan.canBeExtended %}
+                        <form method="post" action="{{ path('app_loan_extend', {id: activeLoan.id}) }}"
+                              data-turbo-confirm="{{ 'loan.extend_confirm'|trans({days: 14}) }}" data-confirm-button="{{ 'loan.extend'|trans({days: 14}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('extend-loan-' ~ activeLoan.id) }}">
+                            <button type="submit" class="btn btn-secondary btn-block">{{ icon('calendar', 'icon-sm') }} {{ 'loan.extend'|trans({days: 14}) }}</button>
+                        </form>
+                    {% else %}
+                        <p class="subtle" style="margin:0">{{ 'loan.extend_max'|trans({max: 2}) }}</p>
+                    {% endif %}
+                </div>
+
+            {% elseif activeLoan %}
+                <div class="notice notice-warning">{{ icon('clock') }}<p>{{ 'loan.currently_at'|trans({name: activeLoan.borrower.name, since: activeLoan.lentAt|since}) }}{% if activeLoan.dueAt %} {{ 'loan.back_expected'|trans({date: activeLoan.dueAt|ldate}) }}{% endif %}</p></div>
+                {% set my_position = book.waitlistPosition(app.user) %}
+                {% if my_position %}
+                    <div class="card card-tight status-card">
+                        <p style="margin:0"><strong>{{ 'waitlist.your_position'|trans({position: my_position}) }}</strong><br><span class="subtle">{{ 'waitlist.you_get_notified'|trans }}</span></p>
+                        <form method="post" action="{{ path('app_waitlist_leave', {id: book.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('waitlist-' ~ book.id) }}">
+                            <button type="submit" class="btn btn-ghost btn-block">{{ 'waitlist.leave'|trans }}</button>
+                        </form>
+                    </div>
+                {% elseif is_granted('BOOK_WAITLIST', book) %}
+                    <form method="post" action="{{ path('app_waitlist_join', {id: book.id}) }}" class="stack">
+                        <input type="hidden" name="_token" value="{{ csrf_token('waitlist-' ~ book.id) }}">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('users') }} {{ 'waitlist.join'|trans }}</button>
+                        <p class="subtle text-center" style="margin:0">{{ 'waitlist.count'|trans({count: book.waitlist|length}) }}</p>
+                    </form>
+                {% endif %}
+
+            {% elseif myRequest %}
+                <div class="card card-tight status-card">
+                    <div class="status-line">
+                        <span class="avatar" style="--av: {{ avatar_color(book.owner) }}" aria-hidden="true">{{ book.owner.initial }}</span>
+                        <p><strong>{{ 'request.pending'|trans({name: book.owner.name}) }}</strong><br><span class="subtle">{{ 'request.pending_since'|trans({when: myRequest.createdAt|relative_date}) }}</span></p>
+                    </div>
+                    <form method="post" action="{{ path('app_request_cancel', {id: myRequest.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cancel-request-' ~ myRequest.id) }}">
+                        <button type="submit" class="btn btn-secondary btn-block">{{ 'request.cancel'|trans }}</button>
+                    </form>
+                </div>
+
+            {% elseif is_granted('BOOK_REQUEST', book) %}
+                <form method="post" action="{{ path('app_request_create', {id: book.id}) }}" class="stack">
+                    <input type="hidden" name="_token" value="{{ csrf_token('request-book-' ~ book.id) }}">
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('send') }} {{ 'request.button'|trans }}</button>
+                    <details>
+                        <summary class="btn btn-ghost btn-sm btn-block">{{ icon('pencil', 'icon-sm') }} {{ 'request.add_message'|trans({name: book.owner.name}) }}</summary>
+                        <div class="form" style="margin-top: 8px">
+                            <div class="form-row">
+                                <label for="request-message" class="visually-hidden">{{ 'request.message_label'|trans }}</label>
+                                <textarea id="request-message" name="message" maxlength="300" rows="3" class="input" placeholder="{{ 'request.message_placeholder'|trans }}"></textarea>
+                            </div>
+                        </div>
+                    </details>
+                </form>
+            {% endif %}
+
+            {# Offene Anfragen für dieses Buch (nur Besitzer) #}
+            {% if is_owner and book.openRequests is not empty %}
+                <div class="stack" style="margin-top: 8px">
+                    <h2 class="section-title">{{ 'request.list_title'|trans }} <span class="count count-alert">{{ book.openRequests|length }}</span></h2>
+                    <ul class="list">
+                        {% for request in book.openRequests %}
+                            {{ include('dashboard/_request_item.html.twig', {request: request, from: 'book', show_cover: false}) }}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </section>
+
+        {# ---------- Standort & Status: Wem gehört es, wer hat es, wo ist es? ---------- #}
+        {% set holder = activeLoan ? activeLoan.borrower : book.owner %}
+        <section class="card card-tight location-card" aria-labelledby="h-location">
+            <h2 class="section-title" id="h-location">{{ icon('map-pin') }} {{ 'book.location.title'|trans }}</h2>
+            <dl class="location-list">
+                <div>
+                    <dt>{{ 'book.location.owner'|trans }}</dt>
+                    <dd>{% if is_owner %}<strong>{{ 'book.show.your_book'|trans }}</strong>{% else %}<strong>{{ book.owner.fullName }}</strong>{% endif %}{% if book.owner.district %} · {{ book.owner.district|trans }}{% endif %}</dd>
+                </div>
+                <div>
+                    <dt>{{ 'book.location.holder'|trans }}</dt>
+                    <dd>{% if activeLoan %}<strong>{{ lent_to_me ? 'book.show.you'|trans : activeLoan.borrower.fullName }}</strong>{% if activeLoan.borrower.district %} · {{ activeLoan.borrower.district|trans }}{% endif %}{% else %}{{ 'book.location.at_owner'|trans }}{% endif %}</dd>
+                </div>
+                <div>
+                    <dt>{{ 'book.location.status'|trans }}</dt>
+                    <dd>{{ include('book/_status_badge.html.twig', {loan: activeLoan}) }}{% if activeLoan and activeLoan.dueAt %} <span class="subtle">{{ 'loan.due_until'|trans({date: activeLoan.dueAt|ldate('short')}) }}</span>{% endif %}</dd>
+                </div>
+                <div>
+                    <dt>{{ 'book.location.district'|trans }}</dt>
+                    <dd>{% if holder.district %}<strong>{{ holder.district|trans }}</strong>{% else %}<span class="subtle">{{ 'book.location.unknown'|trans }}</span>{% endif %}</dd>
+                </div>
+            </dl>
+            <p class="subtle" style="margin:0">{{ 'book.show.added_on'|trans({date: book.createdAt|ldate}) }}</p>
+        </section>
+
+        {% if book.review %}
+            <section>
+                <h2 class="section-title">{{ is_owner ? 'book.show.review_mine'|trans : 'book.show.review_by'|trans({name: book.owner.name}) }}</h2>
+                <blockquote class="book-review">{{ book.review }}</blockquote>
+            </section>
+        {% endif %}
+
+        {% if is_granted('BOOK_VIEW_NOTE', book) and book.ownerNote %}
+            <div class="private-note">
+                {{ icon('lock') }}
+                <p><strong>{{ 'book.show.private_note'|trans }}</strong>{{ book.ownerNote }}</p>
+            </div>
+        {% endif %}
+
+        {% if book.description %}
+            <section>
+                <h2 class="section-title">{{ 'book.field.description'|trans }}</h2>
+                <p class="description">{{ book.description }}</p>
+            </section>
+        {% endif %}
+
+        {# ---------- Infos ---------- #}
+        {% set has_facts = book.awards or book.publisher or book.publishedYear or book.language or book.pageCount or book.format or book.condition or book.isbn or book.series or book.genres is not empty %}
+        {% if has_facts %}
+            <section>
+                <h2 class="section-title">{{ 'book.show.facts'|trans }}</h2>
+                <dl class="facts card">
+                    {% if book.awards %}
+                        <div class="wide"><dt>{{ 'book.field.awards'|trans }}</dt><dd>{{ book.awards }}</dd></div>
+                    {% endif %}
+                    {% if book.series %}
+                        <div class="wide"><dt>{{ 'book.field.series'|trans }}</dt><dd>{{ book.series }}{% if book.seriesNumber %}, {{ 'book.show.volume'|trans({number: book.seriesNumber}) }}{% endif %}</dd></div>
+                    {% endif %}
+                    {% if book.publisher %}<div><dt>{{ 'book.field.publisher'|trans }}</dt><dd>{{ book.publisher }}</dd></div>{% endif %}
+                    {% if book.publishedYear %}<div><dt>{{ 'book.show.published'|trans }}</dt><dd>{{ book.publishedYear }}</dd></div>{% endif %}
+                    {% if book.language %}<div><dt>{{ 'book.field.language'|trans }}</dt><dd>{{ book.language|language_name }}</dd></div>{% endif %}
+                    {% if book.pageCount %}<div><dt>{{ 'book.field.pages'|trans }}</dt><dd>{{ book.pageCount }}</dd></div>{% endif %}
+                    {% if book.format %}<div><dt>{{ 'book.field.format'|trans }}</dt><dd>{{ book.format|trans }}</dd></div>{% endif %}
+                    {% if book.condition %}<div><dt>{{ 'book.field.condition'|trans }}</dt><dd>{{ book.condition|trans }}</dd></div>{% endif %}
+                    {% if book.isbn %}<div><dt>ISBN</dt><dd>{{ book.isbn }}</dd></div>{% endif %}
+                    {% if book.genres is not empty %}
+                        <div class="wide"><dt>{{ 'book.field.genres'|trans }}</dt>
+                            <dd class="chips" style="margin-top:6px">
+                                {% for genre in book.genres %}<a class="chip" href="{{ path('app_book_index', {genre: genre.id}) }}">{{ genre.name|genre_name }}</a>{% endfor %}
+                            </dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            </section>
+        {% endif %}
+
+        {# ---------- Verlauf ---------- #}
+        <section>
+            <h2 class="section-title">{{ 'book.show.history'|trans }}</h2>
+            {% if book.loans is empty %}
+                <p class="subtle">{{ 'book.show.never_lent'|trans }}</p>
+            {% else %}
+                <ol class="timeline">
+                    {% for loan in book.loans %}
+                        <li class="{{ loan.active ? (loan.overdue ? 'is-overdue' : 'is-active') }}">
+                            <div class="who">{{ loan.borrower.id == app.user.id ? 'book.show.you'|trans : loan.borrower.name }}</div>
+                            <div class="when">
+                                {{ loan.lentAt|ldate }} –
+                                {% if loan.returnedAt %}{{ loan.returnedAt|ldate }}{% else %}{{ 'date.today'|trans }}{% if loan.overdue %} · <strong style="color: var(--danger-text)">{{ 'book.show.overdue'|trans }}</strong>{% endif %}{% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </section>
+
+        {# ---------- Bearbeiten / Löschen (Besitzer – und Admins, um Fehler zu korrigieren) ---------- #}
+        {% if is_owner or is_granted('ROLE_ADMIN') %}
+            <div class="owner-actions{{ is_owner ? '' : ' admin-actions' }}">
+                {% if not is_owner %}<span class="admin-tag">{{ icon('shield', 'icon-sm') }} {{ 'admin.tag'|trans }}</span>{% endif %}
+                <a class="btn btn-secondary" href="{{ path('app_book_edit', {id: book.id}) }}">{{ icon('pencil', 'icon-sm') }} {{ 'book.show.edit'|trans }}</a>
+                <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}"
+                      data-turbo-confirm="{{ 'book.show.delete_confirm'|trans({title: book.title}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete-book-' ~ book.id) }}">
+                    <button type="submit" class="btn btn-danger-ghost">{{ icon('trash', 'icon-sm') }} {{ 'confirm.delete'|trans }}</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

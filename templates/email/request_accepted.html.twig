@@ -1,0 +1,9 @@
+{% extends 'email/_layout.html.twig' %}
+{% block content %}
+    <p style="margin:0 0 16px;">{{ 'email.request_accepted.text'|trans({name: book.owner.name, title: book.title}) }} 📚</p>
+    <p style="margin:0 0 16px;">
+        {{ 'email.request_accepted.pickup'|trans }}
+        {% if loan.dueAt %}{{ 'email.request_accepted.due'|trans({date: loan.dueAt|ldate}) }}{% endif %}
+    </p>
+    {{ include('email/_button.html.twig', {url: url('app_book_show', {id: book.id}), label: 'email.to_book'|trans}) }}
+{% endblock %}

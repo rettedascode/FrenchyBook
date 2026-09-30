@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ recipient.locale }}">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f6f5f2;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1d1f24;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f5f2;padding:24px 12px;">
+        <tr><td align="center">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;border:1px solid #e3e1db;">
+                <tr><td style="padding:24px 28px 0;">
+                    {# Flaggenfarben; Weiß als helles Silber, da Mailprogramme Konturen oft nicht darstellen #}
+                    <span style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:bold;"><span style="color:#0055a4;">Fr</span><span style="color:#aab4c5;">enc</span><span style="color:#e1000f;">hy</span><em style="color:#1d1f24;">Book</em></span>
+                </td></tr>
+                <tr><td style="padding:16px 28px 28px;font-size:16px;line-height:1.55;">
+                    <p style="margin:0 0 16px;">{{ 'email.greeting'|trans({name: recipient.name}) }}</p>
+                    {% block content %}{% endblock %}
+                    <p style="margin:24px 0 0;color:#5f636b;">{{ 'email.signature'|trans|nl2br }}</p>
+                </td></tr>
+            </table>
+            <p style="font-size:12px;color:#767a82;margin:16px 0 0;">{{ 'email.footer'|trans }}</p>
+        </td></tr>
+    </table>
+</body>
+</html>

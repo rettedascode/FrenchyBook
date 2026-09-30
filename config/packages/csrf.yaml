@@ -1,0 +1,8 @@
+# Klassischer, sessionbasierter CSRF-Schutz für alle Formulare und Aktions-Buttons.
+# Funktioniert mit und ohne JavaScript sowie mit Turbo.
+framework:
+    form:
+        csrf_protection:
+            enabled: true
+    csrf_protection:
+        enabled: true

@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+{% import 'base.html.twig' as layout %}
+
+{% block title %}{{ 'register.title'|trans }}{% endblock %}
+
+{% block body %}
+<div class="auth">
+    <div class="auth-hero">
+        <div class="logo-mark">{{ icon('book') }}</div>
+        <h1>{{ 'register.heading'|trans }}</h1>
+        <p>{{ 'register.intro'|trans }}</p>
+    </div>
+
+    <div class="card">
+        {{ form_start(form, {attr: {class: 'form', novalidate: 'novalidate'}}) }}
+            {{ form_errors(form) }}
+            <div class="form-grid form-grid-2">
+                {{ form_row(form.firstName) }}
+                {{ form_row(form.lastName) }}
+            </div>
+            {{ form_row(form.district) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.plainPassword) }}
+            {% if form.inviteCode is defined %}
+                {{ form_row(form.inviteCode) }}
+            {% endif %}
+            <button type="submit" class="btn btn-primary btn-block btn-lg">{{ 'register.submit'|trans }}</button>
+        {{ form_end(form) }}
+    </div>
+
+    <p class="auth-switch">{{ 'register.have_account'|trans }} <a href="{{ path('app_login') }}">{{ 'register.login_link'|trans }}</a></p>
+    <p class="auth-switch auth-help">{{ icon('help', 'icon-sm') }} {{ 'help.new_here'|trans }} <a href="{{ path('app_help') }}">{{ 'help.how_it_works'|trans }}</a></p>
+    <div class="auth-lang">{{ layout.language_dropdown('auth') }}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+{% import 'base.html.twig' as layout %}
+
+{% block title %}{{ 'login.title'|trans }}{% endblock %}
+
+{% block body %}
+<div class="auth">
+    <div class="auth-hero">
+        <div class="logo-mark">{{ icon('book') }}</div>
+        <h1>{{ 'login.heading'|trans }}</h1>
+        <p>{{ 'login.intro'|trans }}</p>
+    </div>
+
+    <div class="card">
+        <form method="post" action="{{ path('app_login') }}" class="form">
+            {% if error %}
+                <div class="notice notice-danger" role="alert">
+                    {{ icon('alert') }}
+                    <p>{{ error.messageKey == 'Invalid credentials.' ? 'login.error.credentials'|trans : error.messageKey|trans(error.messageData, 'security') }}</p>
+                </div>
+            {% endif %}
+
+            <div class="form-row">
+                <label for="username">{{ 'login.username'|trans }}</label>
+                <input type="text" id="username" name="username" value="{{ last_username }}" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required{% if not last_username %} data-autofocus{% endif %}>
+            </div>
+            <div class="form-row">
+                <label for="password">{{ 'login.password'|trans }}</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required{% if last_username %} data-autofocus{% endif %}>
+                {% if mail_enabled() %}
+                    <a class="form-help forgot-link" href="{{ path('app_forgot_password') }}">{{ 'login.forgot_password'|trans }}</a>
+                {% endif %}
+            </div>
+
+            <label class="checkbox-row">
+                <input type="checkbox" name="_remember_me" checked>
+                <span>{{ 'login.remember_me'|trans }}</span>
+            </label>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">{{ 'login.submit'|trans }}</button>
+        </form>
+    </div>
+
+    <p class="auth-switch">{{ 'login.no_account'|trans }} <a href="{{ path('app_register') }}">{{ 'login.register_link'|trans }}</a></p>
+    <p class="auth-switch auth-help">{{ icon('help', 'icon-sm') }} {{ 'help.new_here'|trans }} <a href="{{ path('app_help') }}">{{ 'help.how_it_works'|trans }}</a></p>
+    <div class="auth-lang">{{ layout.language_dropdown('auth') }}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+{% import 'base.html.twig' as layout %}
+
+{% block title %}{{ 'nav.profile'|trans }}{% endblock %}
+{% block nav_section %}profile{% endblock %}
+
+{% block body %}
+<div class="isbn-step">
+    <div class="profile-head">
+        <span class="avatar avatar-lg" style="--av: {{ avatar_color(app.user) }}" aria-hidden="true">{{ app.user.initial }}</span>
+        <div>
+            <h1>{{ app.user.name }}</h1>
+            <p class="subtle">{% if app.user.firstName %}{{ app.user.fullName }} · {% endif %}{% if app.user.district %}{{ icon('map-pin', 'icon-sm inline-icon') }} {{ app.user.district|trans }} · {% endif %}{{ 'profile.member_since'|trans({date: app.user.createdAt|ldate}) }}</p>
+        </div>
+    </div>
+
+    <div class="stack-lg">
+        <div class="stat-row">
+            <a class="stat" href="{{ path('app_book_index', {mine: 1}) }}"><strong>{{ bookCount }}</strong><span>{{ 'profile.stat_books'|trans({count: bookCount}) }}</span></a>
+            <a class="stat" href="{{ path('app_dashboard') }}#h-lent"><strong>{{ lentCount }}</strong><span>{{ 'profile.stat_lent'|trans }}</span></a>
+            <a class="stat" href="{{ path('app_dashboard') }}#h-borrowed"><strong>{{ borrowedCount }}</strong><span>{{ 'profile.stat_borrowed'|trans }}</span></a>
+        </div>
+
+        <div class="notice">
+            {{ icon('users') }}
+            <p>
+                {{ 'profile.invite'|trans }} <strong>{{ url('app_register') }}</strong>{% if inviteCode %} {{ 'profile.invite_code'|trans }} <span class="code">{{ inviteCode }}</span>{% endif %}
+            </p>
+        </div>
+
+        <section class="card stack" aria-labelledby="h-app">
+            <h2 id="h-app">{{ 'pwa.section_title'|trans }}</h2>
+            {{ include('pwa/_install.html.twig') }}
+            {% if push_enabled() %}
+                <hr class="card-divider">
+                {{ include('pwa/_push.html.twig') }}
+            {% endif %}
+        </section>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <a class="card help-card admin-card" href="{{ path('admin_dashboard') }}">
+                <span class="install-icon" aria-hidden="true">{{ icon('shield') }}</span>
+                <span class="install-text"><strong>{{ 'admin.title'|trans }}</strong><span class="subtle">{{ 'admin.card_text'|trans }}</span></span>
+                {{ icon('arrow-right', 'icon-sm') }}
+            </a>
+        {% endif %}
+
+        <a class="card help-card" href="{{ path('app_help') }}">
+            <span class="install-icon" aria-hidden="true">{{ icon('help') }}</span>
+            <span class="install-text"><strong>{{ 'help.link'|trans }}</strong><span class="subtle">{{ 'help.card_text'|trans }}</span></span>
+            {{ icon('arrow-right', 'icon-sm') }}
+        </a>
+
+        <section class="card">
+            <h2>{{ 'profile.data'|trans }}</h2>
+            {{ form_start(profileForm, {attr: {class: 'form', novalidate: 'novalidate'}}) }}
+                <div class="form-grid form-grid-2">
+                    {{ form_row(profileForm.firstName) }}
+                    {{ form_row(profileForm.lastName) }}
+                </div>
+                {{ form_row(profileForm.district) }}
+                {{ form_row(profileForm.name) }}
+                {{ form_row(profileForm.email) }}
+                <button type="submit" class="btn btn-primary btn-block">{{ 'profile.save'|trans }}</button>
+            {{ form_end(profileForm) }}
+        </section>
+
+        <section class="card">
+            <div class="form-row">
+                <span class="form-label" id="language-label">{{ 'profile.language'|trans }}</span>
+                {{ layout.language_dropdown('full') }}
+                <p class="form-help">{{ 'profile.language_help'|trans }}</p>
+            </div>
+        </section>
+
+        <details class="disclosure"{{ passwordForm.vars.submitted ? ' open' }}>
+            <summary><span>{{ icon('lock', 'icon-sm') }} {{ 'profile.password.title'|trans }}</span>{{ icon('chevron-down') }}</summary>
+            <div class="disclosure-body">
+                {{ form_start(passwordForm, {attr: {class: 'form', novalidate: 'novalidate'}}) }}
+                    {{ form_row(passwordForm.currentPassword) }}
+                    {{ form_row(passwordForm.newPassword) }}
+                    <button type="submit" class="btn btn-secondary btn-block">{{ 'profile.password.title'|trans }}</button>
+                {{ form_end(passwordForm) }}
+            </div>
+        </details>
+
+        <a class="btn btn-ghost btn-block" href="{{ logout_path() }}" data-turbo="false">{{ icon('logout') }} {{ 'profile.logout'|trans }}</a>
+    </div>
+</div>
+{% endblock %}

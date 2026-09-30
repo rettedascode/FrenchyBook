@@ -1,0 +1,96 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin_title %}{{ user.name }}{% endblock %}
+{% block admin_section %}users{% endblock %}
+
+{% block admin_body %}
+{% set is_me = user is same as(app.user) %}
+<div class="stack-lg admin-narrow">
+    <p style="margin:0"><a class="admin-back" href="{{ path('admin_users') }}">{{ icon('arrow-left', 'icon-sm') }} {{ 'admin.users.back'|trans }}</a></p>
+
+    {% if tempPassword %}
+        <section class="card admin-password-box" id="passwort" role="alert">
+            <h2>{{ icon('key', 'icon-sm') }} {{ 'admin.users.password_new_title'|trans({name: user.name}) }}</h2>
+            <p class="admin-password">{{ tempPassword }}</p>
+            <p class="muted" style="margin:0">{{ 'admin.users.password_new_text'|trans({name: user.name}) }}</p>
+        </section>
+    {% endif %}
+
+    <div class="profile-head">
+        <span class="avatar avatar-lg" style="--av: {{ avatar_color(user) }}" aria-hidden="true">{{ user.initial }}</span>
+        <div>
+            <p style="margin:0">{{ user.fullName }}{% if user.district %} · {{ icon('map-pin', 'icon-sm inline-icon') }} {{ user.district|trans }}{% endif %}</p>
+            <p style="margin:0"><strong>{{ user.email }}</strong>
+                {% if user.admin %}<span class="badge badge-admin">{{ 'admin.users.is_admin'|trans }}</span>{% endif %}</p>
+            <p class="subtle" style="margin:0">
+                {{ 'profile.member_since'|trans({date: user.createdAt|ldate}) }} ·
+                {% if user.lastLoginAt %}{{ 'admin.users.last_login'|trans({when: user.lastLoginAt|relative_date}) }}{% else %}{{ 'admin.users.never_logged_in'|trans }}{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="stat-row">
+        <a class="stat" href="{{ path('admin_books', {besitzer: user.id}) }}"><strong>{{ bookCount }}</strong><span>{{ 'profile.stat_books'|trans({count: bookCount}) }}</span></a>
+        <a class="stat" href="{{ path('admin_loans') }}"><strong>{{ lentCount }}</strong><span>{{ 'profile.stat_lent'|trans }}</span></a>
+        <a class="stat" href="{{ path('admin_loans') }}"><strong>{{ borrowedCount }}</strong><span>{{ 'profile.stat_borrowed'|trans }}</span></a>
+    </div>
+
+    <p class="subtle admin-devices">
+        {{ icon('bell', 'icon-sm') }}
+        {% if devices is empty %}{{ 'admin.users.no_devices'|trans }}{% else %}{{ 'admin.users.devices'|trans({count: devices|length, list: devices|map(d => d.deviceLabel ?? '?')|join(', ')}) }}{% endif %}
+    </p>
+
+    {# Daten korrigieren #}
+    <section class="card">
+        <h2>{{ 'admin.users.edit_title'|trans }}</h2>
+        {{ form_start(form, {attr: {class: 'form', novalidate: 'novalidate'}}) }}
+            <div class="form-grid form-grid-2">
+                {{ form_row(form.firstName) }}
+                {{ form_row(form.lastName) }}
+            </div>
+            {{ form_row(form.district) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.locale) }}
+            <button type="submit" class="btn btn-primary btn-block">{{ 'profile.save'|trans }}</button>
+        {{ form_end(form) }}
+    </section>
+
+    {# Passwort vergessen #}
+    <section class="card stack">
+        <h2>{{ icon('key', 'icon-sm') }} {{ 'admin.users.password_title'|trans }}</h2>
+        <p class="muted" style="margin:0">{{ 'admin.users.password_text'|trans({name: user.name}) }}</p>
+        <form method="post" action="{{ path('admin_user_password', {id: user.id}) }}"
+              data-turbo-confirm="{{ 'admin.users.password_confirm'|trans({name: user.name}) }}" data-confirm-button="{{ 'admin.users.password_button'|trans }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin-password-' ~ user.id) }}">
+            <button type="submit" class="btn btn-secondary">{{ icon('refresh', 'icon-sm') }} {{ 'admin.users.password_button'|trans }}</button>
+        </form>
+    </section>
+
+    {% if not is_me %}
+        {# Rechte #}
+        <section class="card stack">
+            <h2>{{ icon('shield', 'icon-sm') }} {{ 'admin.users.rights_title'|trans }}</h2>
+            <p class="muted" style="margin:0">{{ (user.admin ? 'admin.users.rights_is_admin' : 'admin.users.rights_not_admin')|trans({name: user.name}) }}</p>
+            <form method="post" action="{{ path('admin_user_toggle_admin', {id: user.id}) }}"
+                  data-turbo-confirm="{{ (user.admin ? 'admin.users.admin_off_confirm' : 'admin.users.admin_on_confirm')|trans({name: user.name}) }}" data-confirm-button="{{ (user.admin ? 'admin.users.admin_off' : 'admin.users.admin_on')|trans }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin-toggle-' ~ user.id) }}">
+                <button type="submit" class="btn btn-secondary">{{ (user.admin ? 'admin.users.admin_off' : 'admin.users.admin_on')|trans }}</button>
+            </form>
+        </section>
+
+        {# Löschen #}
+        <section class="card stack admin-danger">
+            <h2>{{ icon('trash', 'icon-sm') }} {{ 'admin.users.delete_title'|trans }}</h2>
+            <p class="muted" style="margin:0">{{ 'admin.users.delete_text'|trans({name: user.name, count: bookCount}) }}</p>
+            <form method="post" action="{{ path('admin_user_delete', {id: user.id}) }}"
+                  data-turbo-confirm="{{ 'admin.users.delete_confirm'|trans({name: user.name, count: bookCount}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin-delete-user-' ~ user.id) }}">
+                <button type="submit" class="btn btn-danger-ghost">{{ icon('trash', 'icon-sm') }} {{ 'admin.users.delete_button'|trans({name: user.name}) }}</button>
+            </form>
+        </section>
+    {% else %}
+        <p class="subtle">{{ 'admin.users.this_is_you'|trans }}</p>
+    {% endif %}
+</div>
+{% endblock %}

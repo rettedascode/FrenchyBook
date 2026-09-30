@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" viewBox="0 0 64 64">
+  <title>FrenchyBook</title>
+  <rect width="64" height="64" fill="#2c55b8"/>
+  <path d="M18 46V18C18 15.239 20.239 13 23 13H46V51H23C20.239 51 18 48.761 18 46C18 43.239 20.239 41 23 41H46" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

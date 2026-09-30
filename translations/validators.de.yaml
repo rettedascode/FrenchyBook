@@ -1,0 +1,89 @@
+# Validierungsmeldungen – Deutsch (Platzhalter im Symfony-Format {{ limit }})
+
+user:
+  email:
+    taken: 'Mit dieser E-Mail-Adresse ist schon jemand registriert.'
+    not_blank: 'Bitte gib deine E-Mail-Adresse ein.'
+    invalid: 'Das sieht nicht nach einer gültigen E-Mail-Adresse aus.'
+  name:
+    invalid_chars: 'Bitte nur Buchstaben, Ziffern, Leerzeichen sowie . _ - verwenden – am Anfang ein Buchstabe oder eine Ziffer.'
+    too_short: 'Der Benutzername muss mindestens {{ limit }} Zeichen lang sein.'
+    taken: 'Dieser Benutzername ist schon vergeben – probier z. B. „Lena M.“.'
+    not_blank: 'Bitte wähle einen Benutzernamen.'
+    too_long: 'Der Benutzername darf höchstens {{ limit }} Zeichen lang sein.'
+  locale:
+    invalid: 'Bitte wähle eine der angebotenen Sprachen.'
+  password:
+    not_blank: 'Bitte wähle ein Passwort.'
+    too_short: 'Dein Passwort sollte mindestens {{ limit }} Zeichen lang sein.'
+    current_not_blank: 'Bitte gib dein aktuelles Passwort ein.'
+    current_wrong: 'Das aktuelle Passwort stimmt nicht.'
+    new_not_blank: 'Bitte gib ein neues Passwort ein.'
+  invite_code:
+    not_blank: 'Bitte gib den Einladungscode ein.'
+    invalid: 'Dieser Einladungscode stimmt leider nicht.'
+  first_name:
+    not_blank: 'Bitte gib deinen Vornamen ein.'
+    too_long: 'Der Vorname darf höchstens 50 Zeichen haben.'
+  last_name:
+    not_blank: 'Bitte gib deinen Nachnamen ein.'
+    too_long: 'Der Nachname darf höchstens 50 Zeichen haben.'
+  district:
+    not_blank: 'Bitte wähle deinen Kölner Bezirk aus.'
+
+book:
+  title:
+    not_blank: 'Bitte gib einen Titel ein.'
+    too_long: 'Der Titel darf höchstens {{ limit }} Zeichen lang sein.'
+  subtitle:
+    too_long: 'Der Untertitel darf höchstens {{ limit }} Zeichen lang sein.'
+  authors:
+    min: 'Bitte gib mindestens einen Autor an.'
+  isbn:
+    invalid: 'Diese ISBN stimmt nicht – bitte prüfe die Ziffern (ISBN-10 oder ISBN-13).'
+  publisher:
+    too_long: 'Der Verlag darf höchstens {{ limit }} Zeichen lang sein.'
+  year:
+    range: 'Bitte gib ein Jahr zwischen {{ min }} und {{ max }} ein.'
+    invalid: 'Bitte gib das Jahr als Zahl ein, z. B. 2019.'
+  pages:
+    range: 'Die Seitenzahl sollte zwischen {{ min }} und {{ max }} liegen.'
+    invalid: 'Bitte gib die Seitenzahl als Zahl ein.'
+  series:
+    too_long: 'Der Name der Reihe darf höchstens {{ limit }} Zeichen lang sein.'
+  series_number:
+    range: 'Der Band sollte zwischen {{ min }} und {{ max }} liegen.'
+    invalid: 'Bitte gib die Bandnummer als Zahl ein.'
+  description:
+    too_long: 'Der Klappentext ist zu lang (höchstens {{ limit }} Zeichen).'
+  note:
+    too_long: 'Die Notiz darf höchstens {{ limit }} Zeichen lang sein.'
+  genre:
+    too_long: 'Das Genre darf höchstens {{ limit }} Zeichen lang sein.'
+  awards:
+    too_long: 'Die Auszeichnungen dürfen höchstens 255 Zeichen haben.'
+  review:
+    too_long: 'Der Kommentar darf höchstens 2000 Zeichen haben.'
+  rating:
+    range: 'Bitte vergib 1 bis 5 Sterne.'
+
+loan:
+  borrower:
+    not_null: 'Bitte wähle aus, wer das Buch bekommt.'
+  due_at:
+    past: 'Das Rückgabedatum sollte heute oder später sein.'
+    invalid: 'Bitte gib ein gültiges Datum ein.'
+  note:
+    too_long: 'Die Notiz darf höchstens {{ limit }} Zeichen lang sein.'
+
+request:
+  message:
+    too_long: 'Die Nachricht darf höchstens {{ limit }} Zeichen lang sein.'
+
+cover:
+  too_large: 'Das Bild ist zu groß ({{ size }} {{ suffix }}). Erlaubt sind höchstens {{ limit }} {{ suffix }}.'
+  too_large_simple: 'Das Bild ist zu groß. Erlaubt sind höchstens 5 MB.'
+  format: 'Bitte lade ein Foto im Format JPG, PNG oder WebP hoch.'
+  upload_failed: 'Das Bild konnte nicht hochgeladen werden. Bitte versuch es noch einmal.'
+  corrupted: 'Das Bild scheint beschädigt zu sein. Bitte versuch es mit einem anderen Foto.'
+  too_many_pixels: 'Das Bild hat zu viele Pixel. Bitte wähle ein kleineres Foto.'

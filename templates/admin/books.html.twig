@@ -1,0 +1,55 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin_title %}{{ 'admin.nav.books'|trans }}{% endblock %}
+{% block admin_section %}books{% endblock %}
+
+{% block admin_body %}
+<form method="get" action="{{ path('admin_books') }}" class="form admin-filter" role="search" data-controller="autosubmit">
+    <label class="visually-hidden" for="admin-q">{{ 'books.search_label'|trans }}</label>
+    <input type="search" id="admin-q" name="q" value="{{ query }}" placeholder="{{ 'books.search_placeholder'|trans }}" enterkeyhint="search">
+    <label class="visually-hidden" for="admin-owner">{{ 'admin.books.owner'|trans }}</label>
+    <select id="admin-owner" name="besitzer" data-action="change->autosubmit#submit">
+        <option value="">{{ 'admin.books.all_owners'|trans }}</option>
+        {% for u in users %}<option value="{{ u.id }}"{% if owner and owner.id == u.id %} selected{% endif %}>{{ u.name }}</option>{% endfor %}
+    </select>
+</form>
+
+<p class="subtle">{{ 'admin.books.count'|trans({count: books|length}) }}</p>
+
+<ul class="list">
+    {% for book in books %}
+        {% set loan = activeLoans[book.id] ?? null %}
+        <li class="list-item admin-book">
+            <a href="{{ path('app_book_show', {id: book.id}) }}" tabindex="-1" aria-hidden="true">{{ include('book/_cover.html.twig', {book: book, size: 'mini', decorative: true}) }}</a>
+            <div class="list-item-body">
+                <a class="list-item-title" href="{{ path('app_book_show', {id: book.id}) }}">{{ book.title }}</a>
+                <div class="list-item-meta">{{ 'admin.books.owned_by'|trans({name: book.owner.name}) }}{% if book.isbn %} · ISBN {{ book.isbn }}{% endif %}</div>
+                {% if loan %}<span class="badge {{ loan.overdue ? 'badge-overdue' : 'badge-lent' }}"><span>{{ 'status.lent'|trans({name: loan.borrower.name}) }}</span></span>{% endif %}
+
+            </div>
+            <div class="admin-row-actions">
+                <a class="btn btn-secondary btn-sm" href="{{ path('app_book_edit', {id: book.id}) }}">{{ icon('pencil', 'icon-sm') }} {{ 'book.show.edit'|trans }}</a>
+                <details class="admin-inline">
+                    <summary class="btn btn-ghost btn-sm">{{ icon('users', 'icon-sm') }} {{ 'admin.books.change_owner'|trans }}</summary>
+                    <form method="post" action="{{ path('admin_book_owner', {id: book.id}) }}" class="form admin-inline-form">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin-book-owner-' ~ book.id) }}">
+                        <input type="hidden" name="q" value="{{ query }}">
+                        <label class="visually-hidden" for="owner-{{ book.id }}">{{ 'admin.books.new_owner'|trans }}</label>
+                        <select id="owner-{{ book.id }}" name="owner">
+                            {% for u in users %}<option value="{{ u.id }}"{% if u.id == book.owner.id %} selected{% endif %}>{{ u.name }}</option>{% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">{{ 'profile.save'|trans }}</button>
+                    </form>
+                </details>
+                <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}"
+                      data-turbo-confirm="{{ 'admin.books.delete_confirm'|trans({title: book.title, name: book.owner.name}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete-book-' ~ book.id) }}">
+                    <button type="submit" class="btn btn-danger-ghost btn-sm">{{ icon('trash', 'icon-sm') }} {{ 'confirm.delete'|trans }}</button>
+                </form>
+            </div>
+        </li>
+    {% else %}
+        <li class="empty-state empty-state-compact"><p>{{ 'admin.books.empty'|trans }}</p></li>
+    {% endfor %}
+</ul>
+{% endblock %}

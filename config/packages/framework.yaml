@@ -1,0 +1,29 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Note that the session will be started ONLY if you read or write from it.
+    session:
+        cookie_lifetime: 0
+        cookie_samesite: lax
+        cookie_secure: auto
+
+    http_client:
+        scoped_clients:
+            openlibrary.client:
+                base_uri: 'https://openlibrary.org'
+                timeout: 5
+                max_duration: 8
+                max_redirects: 3
+                headers:
+                    Accept: 'application/json'
+                    User-Agent: 'FrenchyBook/1.0 (private book sharing app)'
+
+when@test:
+    framework:
+        test: true
+        # Tests gehen nie ins Internet: Open Library & Cover-Downloads werden simuliert
+        http_client:
+            mock_response_factory: App\Tests\Support\FakeOpenLibrary
+        session:
+            storage_factory_id: session.storage.factory.mock_file

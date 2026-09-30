@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Offline · FrenchyBook</title>
+    <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#121317" media="(prefers-color-scheme: dark)">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <style>
+        :root { color-scheme: light dark; --bg: #f6f5f2; --surface: #fff; --text: #1d1f24; --muted: #5f636b; --border: #e3e1db; --accent: #2c55b8; --on-accent: #fff; --blue: #0055a4; --red: #e1000f; --outline: #1b2f5c; }
+        @media (prefers-color-scheme: dark) { :root { --bg: #121317; --surface: #1b1d23; --text: #eceef2; --muted: #a9aeb8; --border: #30333b; --accent: #8eaaff; --on-accent: #0f1629; --blue: #4d8dff; --red: #ff4d57; --outline: transparent; } }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--bg); color: var(--text);
+               font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.55; text-align: center; }
+        .card { max-width: 380px; width: 100%; padding: 32px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; }
+        .logo { font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; }
+        .b { color: var(--blue); } .r { color: var(--red); } em { font-style: italic; }
+        .w { color: #fff; text-shadow: 1px 0 0 var(--outline), -1px 0 0 var(--outline), 0 1px 0 var(--outline), 0 -1px 0 var(--outline); }
+        .icon { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); }
+        h1 { font-size: 1.25rem; margin: 0 0 8px; }
+        p { margin: 0 0 20px; color: var(--muted); }
+        .fr { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: .9rem; }
+        .fr p { margin: 0; }
+        button { width: 100%; min-height: 48px; border: 0; border-radius: 999px; background: var(--accent); color: var(--on-accent); font: inherit; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <div class="logo" aria-label="FrenchyBook"><span class="b">Fr</span><span class="w">enc</span><span class="r">hy</span><em>Book</em></div>
+        <div class="icon" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/><path d="M5 12.86a10 10 0 0 1 5.17-2.69"/><path d="M19 12.86a10 10 0 0 0-2-1.43"/><path d="M2 8.82a15 15 0 0 1 4.18-2.65"/><path d="M22 8.82a15 15 0 0 0-11.29-3.76"/><path d="m2 2 20 20"/></svg>
+        </div>
+        <h1>Du bist gerade offline</h1>
+        <p>Sobald wieder Internet da ist, geht es weiter. Deine Daten sind sicher.</p>
+        <button type="button" onclick="location.reload()">Nochmal versuchen</button>
+        <div class="fr" lang="fr">
+            <p><strong>Tu es hors ligne.</strong> Dès que la connexion revient, tout fonctionne à nouveau.</p>
+        </div>
+    </main>
+    <script>window.addEventListener('online', () => location.reload());</script>
+</body>
+</html>

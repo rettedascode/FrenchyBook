@@ -1,0 +1,32 @@
+{# Push-Benachrichtigungen für dieses Gerät ein-/ausschalten #}
+<div class="push-card" data-controller="push"
+     data-push-public-key-value="{{ push_public_key() }}"
+     data-push-token-value="{{ csrf_token('push') }}"
+     data-push-subscribe-url-value="{{ path('app_push_subscribe') }}"
+     data-push-unsubscribe-url-value="{{ path('app_push_unsubscribe') }}"
+     data-push-test-url-value="{{ path('app_push_test') }}"
+     data-push-messages-value="{{ {
+        on: 'pwa.push.on'|trans,
+        off: 'pwa.push.off'|trans,
+        blocked: 'pwa.push.blocked'|trans,
+        unsupported: 'pwa.push.unsupported'|trans,
+        iosInstall: 'pwa.push.ios_install'|trans,
+        testSent: 'pwa.push.test_sent'|trans,
+        testFailed: 'pwa.push.test_failed'|trans,
+        error: 'pwa.push.error'|trans,
+     }|json_encode }}">
+    <div class="install-row">
+        <span class="install-icon" aria-hidden="true">{{ icon('bell') }}</span>
+        <div class="install-text">
+            <strong>{{ 'pwa.push.title'|trans }}</strong>
+            <p>{{ 'pwa.push.text'|trans }}</p>
+            <p class="push-status" data-push-target="status" aria-live="polite">…</p>
+        </div>
+    </div>
+    <div class="button-group push-actions">
+        <button type="button" class="btn btn-primary btn-sm" data-push-target="enable" data-action="push#enable" hidden>{{ icon('bell', 'icon-sm') }} {{ 'pwa.push.enable'|trans }}</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-push-target="test" data-action="push#test" hidden>{{ icon('send', 'icon-sm') }} {{ 'pwa.push.test'|trans }}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-push-target="disable" data-action="push#disable" hidden>{{ 'pwa.push.disable'|trans }}</button>
+    </div>
+    <p class="form-help" data-push-target="feedback" role="status" hidden></p>
+</div>

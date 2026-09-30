@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ block('admin_title') }} · {{ 'admin.title'|trans }}{% endblock %}
+{% block nav_section %}admin{% endblock %}
+
+{% block body %}
+{% set section = block('admin_section')|trim %}
+<div class="admin">
+    <header class="admin-head">
+        <p class="admin-kicker">{{ icon('shield', 'icon-sm') }} {{ 'admin.title'|trans }}</p>
+        <h1>{{ block('admin_title') }}</h1>
+    </header>
+
+    <nav class="admin-tabs" aria-label="{{ 'admin.title'|trans }}">
+        {% for tab in [
+            { id: 'dashboard', route: 'admin_dashboard', icon: 'home', label: 'admin.nav.dashboard' },
+            { id: 'users', route: 'admin_users', icon: 'users', label: 'admin.nav.users' },
+            { id: 'books', route: 'admin_books', icon: 'books', label: 'admin.nav.books' },
+            { id: 'loans', route: 'admin_loans', icon: 'lend', label: 'admin.nav.loans' },
+            { id: 'errors', route: 'admin_errors', icon: 'alert', label: 'admin.nav.errors' },
+        ] %}
+            <a class="chip" href="{{ path(tab.route) }}"{% if section == tab.id %} aria-current="page"{% endif %}>{{ icon(tab.icon) }}{{ tab.label|trans }}</a>
+        {% endfor %}
+    </nav>
+
+    {% block admin_body %}{% endblock %}
+</div>
+{% endblock %}

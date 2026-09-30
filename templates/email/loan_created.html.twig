@@ -1,0 +1,6 @@
+{% extends 'email/_layout.html.twig' %}
+{% block content %}
+    <p style="margin:0 0 16px;">{{ 'email.loan_created.text'|trans({name: book.owner.name, title: book.title}) }}</p>
+    {% if loan.dueAt %}<p style="margin:0 0 16px;">{{ 'email.loan_created.due'|trans({date: loan.dueAt|ldate}) }}</p>{% endif %}
+    {{ include('email/_button.html.twig', {url: url('app_book_show', {id: book.id}), label: 'email.loan_created.button'|trans}) }}
+{% endblock %}

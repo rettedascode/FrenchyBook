@@ -1,0 +1,20 @@
+{#
+    Cover oder farbiger Platzhalter mit Titel.
+    Parameter: book, size ('thumb'|'mini'|'large'), decorative (alt="" wenn der Titel daneben steht), eager
+#}
+{%- set size = size ?? 'thumb' -%}
+{%- set path = cover_path(book) -%}
+{%- if path -%}
+    <div class="cover">
+        <img src="{{ path|imagine_filter('cover_' ~ size) }}"
+             alt="{{ (decorative ?? false) ? '' : (book.authorNames ? 'cover.alt_with_author'|trans({title: book.title, authors: book.authorNames}) : 'cover.alt'|trans({title: book.title})) }}"
+             loading="{{ (eager ?? false) ? 'eager' : 'lazy' }}" decoding="async"
+             width="{{ size == 'large' ? 400 : (size == 'mini' ? 60 : 180) }}" height="{{ size == 'large' ? 600 : (size == 'mini' ? 90 : 270) }}">
+    </div>
+{%- else -%}
+    <div class="cover cover-placeholder" style="--ph: {{ cover_color(book) }}"
+        {%- if decorative ?? false %} aria-hidden="true"{% else %} role="img" aria-label="{{ 'cover.none'|trans({title: book.title}) }}"{% endif %}>
+        <span class="ph-title">{{ book.title }}</span>
+        {%- if book.authorNames %}<span class="ph-author">{{ book.authorNames }}</span>{% endif -%}
+    </div>
+{%- endif -%}

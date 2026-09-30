@@ -1,0 +1,11 @@
+{% for book in books %}
+    {{ include('book/_tile.html.twig', {eager: filter.page == 1 and loop.index <= 6}) }}
+{% endfor %}
+{% if hasMore %}
+    {% set next_query = filter.toQuery|merge({page: filter.page + 1}) %}
+    <turbo-frame id="books-page-{{ filter.page + 1 }}" target="_top" loading="lazy" src="{{ path('app_book_index', next_query) }}">
+        <div class="load-more">
+            <a class="btn btn-secondary" href="{{ path('app_book_index', next_query) }}" data-turbo-frame="_self">{{ 'books.load_more'|trans }}</a>
+        </div>
+    </turbo-frame>
+{% endif %}

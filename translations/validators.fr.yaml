@@ -1,0 +1,89 @@
+# Messages de validation – Français (variables au format Symfony {{ limit }})
+
+user:
+  email:
+    taken: 'Quelqu’un est déjà inscrit avec cette adresse e-mail.'
+    not_blank: 'Saisis ton adresse e-mail.'
+    invalid: 'Cette adresse e-mail ne semble pas valide.'
+  name:
+    invalid_chars: 'Utilise uniquement des lettres, des chiffres, des espaces et . _ - (en commençant par une lettre ou un chiffre).'
+    too_short: 'Le nom d’utilisateur doit contenir au moins {{ limit }} caractères.'
+    taken: 'Ce nom d’utilisateur est déjà pris – essaie par ex. « Lena M. ».'
+    not_blank: 'Choisis un nom d’utilisateur.'
+    too_long: 'Le nom d’utilisateur ne doit pas dépasser {{ limit }} caractères.'
+  locale:
+    invalid: 'Choisis l’une des langues proposées.'
+  password:
+    not_blank: 'Choisis un mot de passe.'
+    too_short: 'Ton mot de passe doit contenir au moins {{ limit }} caractères.'
+    current_not_blank: 'Saisis ton mot de passe actuel.'
+    current_wrong: 'Le mot de passe actuel est incorrect.'
+    new_not_blank: 'Saisis un nouveau mot de passe.'
+  invite_code:
+    not_blank: 'Saisis le code d’invitation.'
+    invalid: 'Ce code d’invitation n’est pas le bon.'
+  first_name:
+    not_blank: 'Indique ton prénom.'
+    too_long: 'Le prénom ne doit pas dépasser 50 caractères.'
+  last_name:
+    not_blank: 'Indique ton nom.'
+    too_long: 'Le nom ne doit pas dépasser 50 caractères.'
+  district:
+    not_blank: 'Choisis ton quartier de Cologne.'
+
+book:
+  title:
+    not_blank: 'Saisis un titre.'
+    too_long: 'Le titre ne doit pas dépasser {{ limit }} caractères.'
+  subtitle:
+    too_long: 'Le sous-titre ne doit pas dépasser {{ limit }} caractères.'
+  authors:
+    min: 'Indique au moins un auteur.'
+  isbn:
+    invalid: 'Cet ISBN n’est pas valide – vérifie les chiffres (ISBN-10 ou ISBN-13).'
+  publisher:
+    too_long: 'L’éditeur ne doit pas dépasser {{ limit }} caractères.'
+  year:
+    range: 'Saisis une année entre {{ min }} et {{ max }}.'
+    invalid: 'Saisis l’année en chiffres, par ex. 2019.'
+  pages:
+    range: 'Le nombre de pages doit être compris entre {{ min }} et {{ max }}.'
+    invalid: 'Saisis le nombre de pages en chiffres.'
+  series:
+    too_long: 'Le nom de la série ne doit pas dépasser {{ limit }} caractères.'
+  series_number:
+    range: 'Le tome doit être compris entre {{ min }} et {{ max }}.'
+    invalid: 'Saisis le numéro du tome en chiffres.'
+  description:
+    too_long: 'Le résumé est trop long ({{ limit }} caractères maximum).'
+  note:
+    too_long: 'La note ne doit pas dépasser {{ limit }} caractères.'
+  genre:
+    too_long: 'Le genre ne doit pas dépasser {{ limit }} caractères.'
+  awards:
+    too_long: 'Les prix ne doivent pas dépasser 255 caractères.'
+  review:
+    too_long: 'Le commentaire ne doit pas dépasser 2000 caractères.'
+  rating:
+    range: 'Donne une note de 1 à 5 étoiles.'
+
+loan:
+  borrower:
+    not_null: 'Choisis qui reçoit le livre.'
+  due_at:
+    past: 'La date de retour doit être aujourd’hui ou plus tard.'
+    invalid: 'Saisis une date valide.'
+  note:
+    too_long: 'La note ne doit pas dépasser {{ limit }} caractères.'
+
+request:
+  message:
+    too_long: 'Le message ne doit pas dépasser {{ limit }} caractères.'
+
+cover:
+  too_large: 'L’image est trop grande ({{ size }} {{ suffix }}). Maximum autorisé : {{ limit }} {{ suffix }}.'
+  too_large_simple: 'L’image est trop grande. Maximum autorisé : 5 Mo.'
+  format: 'Envoie une photo au format JPG, PNG ou WebP.'
+  upload_failed: 'L’image n’a pas pu être envoyée. Réessaie.'
+  corrupted: 'L’image semble endommagée. Essaie avec une autre photo.'
+  too_many_pixels: 'L’image a trop de pixels. Choisis une photo plus petite.'

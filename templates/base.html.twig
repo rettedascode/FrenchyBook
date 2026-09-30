@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>{% block title %}{% endblock %}{% if block('title') is not empty %} · {% endif %}FrenchyBook</title>
+        <meta name="description" content="{{ 'app.description'|trans }}">
+        <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#121317" media="(prefers-color-scheme: dark)">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="FrenchyBook">
+        <meta name="application-name" content="FrenchyBook">
+        <meta name="turbo-refresh-method" content="morph">
+        <meta name="turbo-refresh-scroll" content="preserve">
+        <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+        {# use-credentials: damit das Manifest in der Sprache des angemeldeten Nutzers kommt #}
+        <link rel="manifest" href="{{ path('app_manifest') }}" crossorigin="use-credentials">
+        {% block stylesheets %}{% endblock %}
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    {% set nav_section = block('nav_section') is defined ? block('nav_section')|trim : '' %}
+    <body>
+        <a class="skip-link" href="#main">{{ 'app.skip_link'|trans }}</a>
+
+        <header class="topbar">
+            <div class="container">
+                <a class="logo" href="{{ path(app.user ? 'app_dashboard' : 'app_login') }}" aria-label="{{ 'app.home_label'|trans }}">
+                    <span class="logo-mark">{{ icon('book') }}</span>
+                    <span class="logo-text"><span class="logo-frenchy"><span class="flag-blue">Fr</span><span class="flag-white">enc</span><span class="flag-red">hy</span></span><em>Book</em></span>
+                </a>
+                <div class="topbar-actions">
+                    {% if app.user %}
+                        <nav class="nav-desktop" aria-label="{{ 'nav.main'|trans }}">
+                            {{ _self.nav_items(nav_section, false) }}
+                        </nav>
+                    {% endif %}
+                    <a class="help-link" href="{{ path('app_help') }}" aria-label="{{ 'help.link'|trans }}" title="{{ 'help.link'|trans }}"{% if app.request.attributes.get('_route') == 'app_help' %} aria-current="page"{% endif %}>{{ icon('help') }}</a>
+                    {{ _self.language_dropdown('header') }}
+                </div>
+            </div>
+        </header>
+
+        <main id="main" class="main" tabindex="-1">
+            <div class="container">
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+
+        <div class="flashes" role="status" aria-live="polite" id="flashes">
+            {% for type, messages in app.flashes(['success', 'info', 'warning', 'error']) %}
+                {% for message in messages %}
+                    <div class="flash flash-{{ type }}" data-controller="flash">
+                        <span class="flash-icon">{{ icon(type == 'success' ? 'check' : (type == 'info' ? 'info' : 'alert')) }}</span>
+                        <span class="flash-text">{{ message|trans }}</span>
+                        <button type="button" data-action="flash#close" aria-label="{{ 'flash.close'|trans }}">{{ icon('x', 'icon-sm') }}</button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        {% if app.user %}
+            <nav class="nav-bottom" aria-label="{{ 'nav.main_mobile'|trans }}">
+                {{ _self.nav_items(nav_section, true) }}
+            </nav>
+        {% endif %}
+
+        {# Wiederverwendbarer Bestätigungsdialog (Löschen – oder mit data-confirm-button eigene Beschriftung) #}
+        <dialog class="confirm-dialog" id="confirm-dialog" aria-labelledby="confirm-dialog-title">
+            <form method="dialog">
+                <h2 id="confirm-dialog-title">{{ 'confirm.title'|trans }}</h2>
+                <p id="confirm-dialog-message"></p>
+                <div class="button-group">
+                    <button class="btn btn-secondary" value="cancel" autofocus>{{ 'confirm.cancel'|trans }}</button>
+                    <button class="btn btn-danger" value="confirm">{{ icon('trash', 'icon-sm') }} {{ 'confirm.delete'|trans }}</button>
+                </div>
+            </form>
+        </dialog>
+    </body>
+</html>
+
+{% macro nav_items(current, mobile) %}
+    {% set items = [
+        { section: 'books', route: 'app_book_index', label: 'nav.books', icon: 'books' },
+        { section: 'add', route: 'app_book_new', label: mobile ? 'nav.add_short' : 'nav.add', icon: 'plus', class: 'nav-add' },
+        { section: 'dashboard', route: 'app_dashboard', label: mobile ? 'nav.dashboard_short' : 'nav.dashboard', icon: 'home' },
+        { section: 'profile', route: 'app_profile', label: 'nav.profile', icon: 'user' },
+    ] %}
+    {# Verwaltung: am Computer in der Leiste, am Handy über die Karte im Profil #}
+    {% if not mobile and is_granted('ROLE_ADMIN') %}
+        {% set items = items|merge([{ section: 'admin', route: 'admin_dashboard', label: 'admin.nav_label', icon: 'shield' }]) %}
+    {% endif %}
+    {% set open_requests = open_request_count() %}
+    <ul>
+        {% for item in items %}
+            <li>
+                <a href="{{ path(item.route) }}" class="{{ item.class ?? '' }}"{% if current == item.section %} aria-current="page"{% endif %}>
+                    {{ icon(item.icon) }}
+                    <span>{{ item.label|trans }}</span>
+                    {% if item.section == 'dashboard' and open_requests > 0 %}
+                        <span class="nav-count" aria-label="{{ 'nav.open_requests'|trans({count: open_requests}) }}">{{ open_requests }}</span>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{#
+    Sprachauswahl als Dropdown mit Flaggen.
+    variant: 'header' (kompakt: Flagge + Kürzel) oder 'full' (Flagge + ganzer Name, z. B. im Profil)
+#}
+{% macro language_dropdown(variant = 'header') %}
+    {% set languages = {de: 'Deutsch', fr: 'Français'} %}
+    {% set current = app.request.locale in languages|keys ? app.request.locale : 'de' %}
+    {% set menu_id = 'lang-menu-' ~ variant %}
+    <div class="lang-dropdown lang-dropdown-{{ variant }}" data-controller="dropdown" data-action="keydown->dropdown#keydown">
+        <button type="button" class="lang-toggle" data-dropdown-target="button" data-action="dropdown#toggle"
+                aria-haspopup="true" aria-expanded="false" aria-controls="{{ menu_id }}"
+                aria-label="{{ 'lang.switch'|trans }}: {{ languages[current] }}">
+            {{ flag(current) }}
+            <span class="lang-toggle-label">{{ variant == 'header' ? current|upper : languages[current] }}</span>
+            {{ icon('chevron-down', 'icon-sm lang-chevron') }}
+        </button>
+        <ul class="lang-menu" id="{{ menu_id }}" role="menu" data-dropdown-target="menu" hidden>
+            {% for code, name in languages %}
+                <li role="none">
+                    <a role="menuitem" href="{{ path('app_language', {locale: code}) }}" hreflang="{{ code }}" lang="{{ code }}"
+                       data-turbo="false" data-dropdown-target="item"{% if code == current %} aria-current="true"{% endif %}>
+                        {{ flag(code) }}
+                        <span>{{ name }}</span>
+                        {% if code == current %}{{ icon('check', 'icon-sm lang-check') }}{% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}

@@ -1,0 +1,11 @@
+framework:
+    default_locale: de
+    # Unterstützte Sprachen der Oberfläche. Eine neue Sprache = neuer Eintrag hier
+    # plus translations/messages+intl-icu.<code>.yaml und validators.<code>.yaml.
+    enabled_locales: ['de', 'fr']
+    # Nicht angemeldete Besucher bekommen die Sprache ihres Browsers
+    set_locale_from_accept_language: true
+    translator:
+        default_path: '%kernel.project_dir%/translations'
+        fallbacks: ['de']
+        providers:

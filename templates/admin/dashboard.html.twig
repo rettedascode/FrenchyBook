@@ -1,0 +1,151 @@
+{% extends 'admin/_layout.html.twig' %}
+
+{% block admin_title %}{{ 'admin.nav.dashboard'|trans }}{% endblock %}
+{% block admin_section %}dashboard{% endblock %}
+
+{% block admin_body %}
+<div class="stack-lg">
+    {# Zahlen auf einen Blick #}
+    <div class="admin-stats">
+        <a class="stat" href="{{ path('admin_users') }}"><strong>{{ stats.users }}</strong><span>{{ 'admin.stats.users'|trans }}</span></a>
+        <a class="stat" href="{{ path('admin_books') }}"><strong>{{ stats.books }}</strong><span>{{ 'admin.stats.books'|trans }}</span></a>
+        <a class="stat" href="{{ path('admin_loans') }}"><strong>{{ stats.loans }}</strong><span>{{ 'admin.stats.loans'|trans }}</span></a>
+        <a class="stat{{ stats.overdue > 0 ? ' stat-alert' }}" href="{{ path('admin_loans') }}"><strong>{{ stats.overdue }}</strong><span>{{ 'admin.stats.overdue'|trans }}</span></a>
+        <a class="stat" href="{{ path('admin_loans') }}#anfragen"><strong>{{ stats.requests }}</strong><span>{{ 'admin.stats.requests'|trans }}</span></a>
+    </div>
+
+    {# Läuft alles? #}
+    <section class="card stack" aria-labelledby="h-status">
+        <h2 id="h-status">{{ 'admin.status.title'|trans }}</h2>
+        <ul class="admin-checks">
+            <li class="{{ checks.mail ? 'is-ok' : 'is-warn' }}">
+                <span class="admin-check-icon" aria-hidden="true">{{ icon(checks.mail ? 'check' : 'alert', 'icon-sm') }}</span>
+                <div>
+                    <strong>{{ 'admin.status.mail'|trans }}</strong>
+                    <p>{{ (checks.mail ? 'admin.status.mail_ok' : 'admin.status.mail_off')|trans }}</p>
+                </div>
+                {% if checks.mail %}
+                    <form method="post" action="{{ path('admin_test_mail') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin-test-mail') }}">
+                        <button type="submit" class="btn btn-secondary btn-sm">{{ icon('mail', 'icon-sm') }} {{ 'admin.test_mail.button'|trans }}</button>
+                    </form>
+                {% endif %}
+            </li>
+            <li class="{{ checks.push ? 'is-ok' : 'is-warn' }}">
+                <span class="admin-check-icon" aria-hidden="true">{{ icon(checks.push ? 'check' : 'alert', 'icon-sm') }}</span>
+                <div>
+                    <strong>{{ 'admin.status.push'|trans }}</strong>
+                    <p>{{ (checks.push ? 'admin.status.push_ok' : 'admin.status.push_off')|trans }}</p>
+                </div>
+            </li>
+            {% set backup = checks.backup %}
+            <li class="{{ backup.state == 'ok' ? 'is-ok' : 'is-warn' }}">
+                <span class="admin-check-icon" aria-hidden="true">{{ icon(backup.state == 'ok' ? 'check' : 'alert', 'icon-sm') }}</span>
+                <div>
+                    <strong>{{ 'admin.status.backup'|trans }}</strong>
+                    <p>
+                        {% if backup.state == 'none' %}
+                            {{ 'admin.status.backup_none'|trans }}
+                        {% else %}
+                            {{ 'admin.status.backup_last'|trans({date: backup.time|ldate('short'), time: backup.time|date('H:i'), size: (backup.size / 1048576)|number_format(1, ',', '.')}) }}
+                            {% if backup.state == 'error' %}<br>{{ 'admin.status.backup_error'|trans }} {{ backup.message }}
+                            {% elseif backup.result == 'local' %}<br>{{ 'admin.status.backup_local'|trans }}
+                            {% elseif backup.state == 'warn' %}<br>{{ 'admin.status.backup_old'|trans }}
+                            {% else %}<br>{{ 'admin.status.backup_ok'|trans }}{% endif %}
+                        {% endif %}
+                    </p>
+                </div>
+            </li>
+            <li class="{{ checks.errors == 0 ? 'is-ok' : 'is-warn' }}">
+                <span class="admin-check-icon" aria-hidden="true">{{ icon(checks.errors == 0 ? 'check' : 'alert', 'icon-sm') }}</span>
+                <div>
+                    <strong>{{ 'admin.status.errors'|trans }}</strong>
+                    <p>{{ 'admin.status.errors_count'|trans({count: checks.errors}) }}</p>
+                </div>
+                {% if checks.errors > 0 %}
+                    <a class="btn btn-secondary btn-sm" href="{{ path('admin_errors') }}">{{ 'admin.status.errors_show'|trans }}</a>
+                {% endif %}
+            </li>
+        </ul>
+    </section>
+
+    {# Einladungscode #}
+    <section class="card stack" id="einladung" aria-labelledby="h-invite">
+        <h2 id="h-invite">{{ 'admin.invite.title'|trans }}</h2>
+        {% if inviteCode %}
+            <p class="muted" style="margin:0">{{ 'admin.invite.text'|trans }}</p>
+            <div class="admin-code-box">
+                <span class="subtle">{{ 'admin.invite.link'|trans }}</span>
+                <strong class="admin-select-all">{{ url('app_register') }}</strong>
+                <span class="subtle">{{ 'admin.invite.code'|trans }}</span>
+                <strong class="code admin-select-all">{{ inviteCode }}</strong>
+            </div>
+        {% else %}
+            <div class="notice notice-warning">{{ icon('alert') }}<p>{{ 'admin.invite.off_text'|trans }}</p></div>
+        {% endif %}
+
+        <div class="button-group">
+            <form method="post" action="{{ path('admin_invite_code') }}"
+                  {% if inviteCode %}data-turbo-confirm="{{ 'admin.invite.new_confirm'|trans }}" data-confirm-button="{{ 'admin.invite.new'|trans }}"{% endif %}>
+                <input type="hidden" name="_token" value="{{ csrf_token('admin-invite-code') }}">
+                <input type="hidden" name="action" value="new">
+                <button type="submit" class="btn btn-primary btn-sm">{{ icon('refresh', 'icon-sm') }} {{ 'admin.invite.new'|trans }}</button>
+            </form>
+            {% if inviteCode %}
+                <form method="post" action="{{ path('admin_invite_code') }}" data-turbo-confirm="{{ 'admin.invite.off_confirm'|trans }}" data-confirm-button="{{ 'admin.invite.off'|trans }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin-invite-code') }}">
+                    <input type="hidden" name="action" value="off">
+                    <button type="submit" class="btn btn-ghost btn-sm">{{ 'admin.invite.off'|trans }}</button>
+                </form>
+            {% endif %}
+        </div>
+
+        <details class="disclosure">
+            <summary><span>{{ icon('pencil', 'icon-sm') }} {{ 'admin.invite.own'|trans }}</span>{{ icon('chevron-down') }}</summary>
+            <div class="disclosure-body">
+                <form method="post" action="{{ path('admin_invite_code') }}" class="form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin-invite-code') }}">
+                    <input type="hidden" name="action" value="set">
+                    <div class="form-row">
+                        <label for="own-code">{{ 'admin.invite.code'|trans }}</label>
+                        <input type="text" id="own-code" name="code" required minlength="4" maxlength="40" pattern="[A-Za-zÀ-ÿ0-9_\-]{4,40}"
+                               autocomplete="off" autocapitalize="off" spellcheck="false" value="{{ inviteCode }}">
+                        <p class="form-help">{{ 'admin.invite.own_help'|trans }}</p>
+                    </div>
+                    <button type="submit" class="btn btn-secondary btn-block">{{ 'profile.save'|trans }}</button>
+                </form>
+            </div>
+        </details>
+    </section>
+
+    {# Neu dabei #}
+    <div class="admin-columns">
+        <section class="card" aria-labelledby="h-new-users">
+            <h2 id="h-new-users">{{ 'admin.newest_users'|trans }}</h2>
+            <ul class="admin-mini-list">
+                {% for user in newestUsers %}
+                    <li>
+                        <span class="avatar" style="--av: {{ avatar_color(user) }}" aria-hidden="true">{{ user.initial }}</span>
+                        <a href="{{ path('admin_user_show', {id: user.id}) }}">{{ user.name }}</a>
+                        <span class="subtle">{{ user.createdAt|relative_date }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <section class="card" aria-labelledby="h-new-books">
+            <h2 id="h-new-books">{{ 'admin.newest_books'|trans }}</h2>
+            <ul class="admin-mini-list">
+                {% for book in newestBooks %}
+                    <li>
+                        {{ include('book/_cover.html.twig', {book: book, size: 'mini', decorative: true}) }}
+                        <a href="{{ path('app_book_show', {id: book.id}) }}">{{ book.title }}</a>
+                        <span class="subtle">{{ book.owner.name }}</span>
+                    </li>
+                {% else %}
+                    <li class="subtle">{{ 'admin.books.empty'|trans }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endblock %}

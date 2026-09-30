@@ -1,0 +1,68 @@
+{% extends 'form_div_layout.html.twig' %}
+
+{# Eine Zeile: Label, Feld, Hilfetext, Fehler #}
+{% block form_row %}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
+    {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set widget_attr = widget_attr|merge({attr: (widget_attr.attr ?? {})|merge({'aria-invalid': 'true'})}) -%}
+    {%- endif -%}
+    <div class="form-row{{ errors|length > 0 ? ' has-error' }}{{ row_attr.class is defined ? ' ' ~ row_attr.class }}">
+        {{- form_label(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{% endblock %}
+
+{% block form_label %}
+    {%- if label is not same as(false) -%}
+        {%- if compound is defined and compound and expanded is defined and expanded -%}
+            <span class="form-label" id="{{ id }}_label">{{ label is empty ? name|humanize : label|trans(label_translation_parameters, translation_domain) }}</span>
+        {%- else -%}
+            {{- parent() -}}
+        {%- endif -%}
+    {%- endif -%}
+{% endblock %}
+
+{% block form_help %}
+    {%- if help is not empty -%}
+        <p id="{{ id }}_help" class="form-help">{{ help|trans(help_translation_parameters, translation_domain) }}</p>
+    {%- endif -%}
+{% endblock %}
+
+{% block form_errors %}
+    {%- if errors|length > 0 -%}
+        <ul class="form-errors{{ form.parent is null ? ' form-errors-global' }}" role="alert">
+            {%- for error in errors -%}
+                <li>{{ error.message }}</li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{% endblock %}
+
+{# Checkbox: große Klickfläche, Label rechts #}
+{% block checkbox_row %}
+    <div class="form-row{{ errors|length > 0 ? ' has-error' }}">
+        <label class="checkbox-row" for="{{ id }}">
+            {{- form_widget(form) -}}
+            <span>{{ label|trans(label_translation_parameters, translation_domain) }}</span>
+        </label>
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{% endblock %}
+
+{# Mehrfach-/Einfachauswahl als tippbare Chips statt Kästchen #}
+{% block choice_widget_expanded %}
+    <div {{ block('widget_container_attributes') }} class="chip-choices" role="group" aria-labelledby="{{ id }}_label">
+        {%- for child in form %}
+            <div class="chip-choice">
+                {{- form_widget(child) -}}
+                <label for="{{ child.vars.id }}" class="chip">{{ child.vars.label|trans(child.vars.label_translation_parameters, choice_translation_domain) }}</label>
+            </div>
+        {% endfor -%}
+    </div>
+{% endblock %}
