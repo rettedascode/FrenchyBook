@@ -120,7 +120,8 @@ class AppFixtures extends Fixture
             ->setLentAt(new \DateTimeImmutable(sprintf('-%d days 18:30', $lentDaysAgo)))
             ->setDueAt(null === $dueInDays ? null : new \DateTimeImmutable(sprintf('today %+d days', $dueInDays)))
             ->setReturnedAt(null === $returnedDaysAgo ? null : new \DateTimeImmutable(sprintf('-%d days 12:00', $returnedDaysAgo)))
-            ->setNote($note);
+            ->setNote($note)
+            ->markHandedOver(); // Beispiel-Ausleihen sind schon übergeben
 
         foreach ([
             // aktiv

@@ -832,6 +832,11 @@ admin:
     clear: 'Vider le journal'
     clear_confirm: 'Supprimer toutes les entrées ? Utile une fois les erreurs corrigées.'
     flash_cleared: 'Le journal des erreurs est vide.'
+  guides:
+    title: 'Guides (PDF)'
+    download: 'Télécharger'
+    text: 'À partager avec le groupe – à imprimer ou à envoyer par messagerie. Ils contiennent le QR code et le code d’invitation.'
+    empty: 'Aucun guide téléversé pour l’instant. Sur l’ordinateur, dans le dossier du projet : make guides-upload'
 
 waitlist:
   join: 'M’inscrire sur la liste d’attente'

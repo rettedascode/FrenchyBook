@@ -18,7 +18,7 @@ APP_DIR := /var/www/frenchybook.com
 PROD    := cd $(APP_DIR) && sudo -u www-data APP_ENV=prod php bin/console
 
 .PHONY: help install start stop cc migrate fixtures db-reset lint test reminders \
-	    deploy rollback ssh status logs backup invite-code reminders-live admins
+	    deploy rollback guides-upload ssh status logs backup invite-code reminders-live admins
 
 help: ## Diese Übersicht
 	@echo "FrenchyBook - make <Befehl>"
@@ -71,6 +71,12 @@ deploy: ## Committeten Stand zu GitHub hochladen und live schalten
 rollback: ## Ältere Version live schalten: make rollback COMMIT=abc1234
 	@test -n "$(COMMIT)" || { echo "Bitte angeben: make rollback COMMIT=<commit> (siehe git log --oneline)"; exit 1; }
 	bin/deploy $(COMMIT)
+
+guides-upload: ## PDF-Anleitungen aus docs/ auf den Server (Verwaltung) und nach Cloudflare R2 laden
+	@ls docs/*.pdf >/dev/null 2>&1 || { echo "Keine PDFs in docs/ gefunden."; exit 1; }
+	ssh $(SERVER) 'mkdir -p $(APP_DIR)/var/guides'
+	scp docs/*.pdf $(SERVER):$(APP_DIR)/var/guides/
+	ssh $(SERVER) 'chown -R www-data:www-data $(APP_DIR)/var/guides && chmod 640 $(APP_DIR)/var/guides/*.pdf && frenchybook-backup --guides'
 
 ## Server
 

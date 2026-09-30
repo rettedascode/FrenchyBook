@@ -118,6 +118,24 @@
         </details>
     </section>
 
+    {# PDF-Anleitungen zum Weitergeben #}
+    <section class="card stack" aria-labelledby="h-guides">
+        <h2 id="h-guides">{{ icon('download', 'icon-sm') }} {{ 'admin.guides.title'|trans }}</h2>
+        {% if guides is empty %}
+            <p class="muted" style="margin:0">{{ 'admin.guides.empty'|trans }}</p>
+        {% else %}
+            <p class="muted" style="margin:0">{{ 'admin.guides.text'|trans }}</p>
+            <ul class="admin-guides">
+                {% for guide in guides %}
+                    <li>
+                        <span class="admin-guide-name">{{ guide.name }}<span class="subtle">{{ (guide.size / 1048576)|number_format(1, ',', '.') }} MB · {{ guide.updated|ldate('short') }}</span></span>
+                        <a class="btn btn-secondary btn-sm" href="{{ path('admin_guide_download', {name: guide.name}) }}" download data-turbo="false">{{ icon('download', 'icon-sm') }} {{ 'admin.guides.download'|trans }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
     {# Neu dabei #}
     <div class="admin-columns">
         <section class="card" aria-labelledby="h-new-users">

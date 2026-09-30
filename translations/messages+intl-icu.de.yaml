@@ -831,6 +831,11 @@ admin:
     clear: 'Protokoll leeren'
     clear_confirm: 'Alle Einträge löschen? Das bietet sich an, wenn du die Fehler behoben hast.'
     flash_cleared: 'Das Fehlerprotokoll ist leer.'
+  guides:
+    title: 'Anleitungen (PDF)'
+    download: 'Herunterladen'
+    text: 'Zum Weitergeben an die Gruppe – zum Ausdrucken oder per Messenger. Sie enthalten den QR-Code und den Einladungscode.'
+    empty: 'Noch keine Anleitungen hochgeladen. Am Computer im Projektordner: make guides-upload'
 
 waitlist:
   join: 'Auf die Warteliste'

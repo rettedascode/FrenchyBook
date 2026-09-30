@@ -9,11 +9,14 @@ use App\Repository\LoanRequestRepository;
 use App\Repository\UserRepository;
 use App\Service\BackupStatus;
 use App\Service\ErrorLog;
+use App\Service\GuideFiles;
 use App\Service\InviteCodeManager;
 use App\Service\PushNotifier;
 use App\Service\UserMailer;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -31,6 +34,7 @@ class DashboardController extends AbstractAdminController
         ErrorLog $errorLog,
         PushNotifier $push,
         BackupStatus $backup,
+        GuideFiles $guides,
         #[Autowire('%env(MAILER_DSN)%')] string $mailerDsn,
     ): Response {
         $overdue = $loans->findOverdue(new \DateTimeImmutable('today'));
@@ -50,9 +54,19 @@ class DashboardController extends AbstractAdminController
                 'backup' => $backup->get(),
             ],
             'inviteCode' => $inviteCodes->current(),
+            'guides' => $guides->all(),
             'newestUsers' => $users->findBy([], ['createdAt' => 'DESC'], 5),
             'newestBooks' => $books->findBy([], ['createdAt' => 'DESC'], 5),
         ]);
+    }
+
+    /** PDF-Anleitung herunterladen (nur Admins – siehe security.yaml: ^/admin) */
+    #[Route('/anleitungen/{name}', name: 'admin_guide_download', requirements: ['name' => '[A-Za-z0-9][A-Za-z0-9._-]*\.pdf'], methods: ['GET'])]
+    public function downloadGuide(string $name, GuideFiles $guides): BinaryFileResponse
+    {
+        $path = $guides->path($name) ?? throw $this->createNotFoundException();
+
+        return $this->file($path, $name, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
     }
 
     #[Route('/einladungscode', name: 'admin_invite_code', methods: ['POST'])]
