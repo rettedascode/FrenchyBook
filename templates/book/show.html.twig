@@ -121,7 +121,7 @@
                     <div class="status-line">
                         <span class="avatar" style="--av: {{ avatar_color(book.owner) }}" aria-hidden="true">{{ book.owner.initial }}</span>
                         <p><strong>{{ 'loan.reserved_for_you'|trans }}</strong><br>
-                           <span class="subtle">{{ 'loan.pickup_at'|trans({name: book.owner.name, district: book.owner.district ? book.owner.district|trans : '–'}) }}</span></p>
+                           <span class="subtle">{{ 'loan.pickup_at'|trans({name: book.owner.name, district: book.owner.locationLabel ?: '–'}) }}</span></p>
                     </div>
                     <form method="post" action="{{ path('app_loan_handover', {id: activeLoan.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ activeLoan.id) }}">
@@ -226,11 +226,11 @@
             <dl class="location-list">
                 <div>
                     <dt>{{ 'book.location.owner'|trans }}</dt>
-                    <dd>{% if is_owner %}<strong>{{ 'book.show.your_book'|trans }}</strong>{% else %}<strong>{{ book.owner.fullName }}</strong>{% endif %}{% if book.owner.district %} · {{ book.owner.district|trans }}{% endif %}</dd>
+                    <dd>{% if is_owner %}<strong>{{ 'book.show.your_book'|trans }}</strong>{% else %}<strong>{{ book.owner.fullName }}</strong>{% endif %}{% if book.owner.locationLabel %} · {{ book.owner.locationLabel }}{% endif %}</dd>
                 </div>
                 <div>
                     <dt>{{ 'book.location.holder'|trans }}</dt>
-                    <dd>{% if handed_over %}<strong>{{ lent_to_me ? 'book.show.you'|trans : activeLoan.borrower.fullName }}</strong>{% if activeLoan.borrower.district %} · {{ activeLoan.borrower.district|trans }}{% endif %}{% else %}{{ 'book.location.at_owner'|trans }}{% endif %}</dd>
+                    <dd>{% if handed_over %}<strong>{{ lent_to_me ? 'book.show.you'|trans : activeLoan.borrower.fullName }}</strong>{% if activeLoan.borrower.locationLabel %} · {{ activeLoan.borrower.locationLabel }}{% endif %}{% else %}{{ 'book.location.at_owner'|trans }}{% endif %}</dd>
                 </div>
                 <div>
                     <dt>{{ 'book.location.status'|trans }}</dt>
@@ -238,7 +238,7 @@
                 </div>
                 <div>
                     <dt>{{ 'book.location.district'|trans }}</dt>
-                    <dd>{% if holder.district %}<strong>{{ holder.district|trans }}</strong>{% else %}<span class="subtle">{{ 'book.location.unknown'|trans }}</span>{% endif %}</dd>
+                    <dd>{% if holder.locationLabel %}<strong>{{ holder.locationLabel }}</strong>{% else %}<span class="subtle">{{ 'book.location.unknown'|trans }}</span>{% endif %}</dd>
                 </div>
             </dl>
             <p class="subtle" style="margin:0">{{ 'book.show.added_on'|trans({date: book.createdAt|ldate}) }}</p>

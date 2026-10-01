@@ -30,6 +30,8 @@ user:
     too_long: 'Le nom ne doit pas dépasser 50 caractères.'
   district:
     not_blank: 'Choisis ton quartier de Cologne.'
+  quarter:
+    not_blank: 'Choisis ton quartier de Cologne.'
 
 book:
   title:

@@ -18,7 +18,7 @@
                 {{ form_row(form.firstName) }}
                 {{ form_row(form.lastName) }}
             </div>
-            {{ form_row(form.district) }}
+            {{ form_row(form.quarter, {attr: {'data-searchable-select-search-value': 'quarter.search'|trans, 'data-searchable-select-empty-value': 'quarter.no_match'|trans}}) }}
             {{ form_row(form.name) }}
             {{ form_row(form.email) }}
             {{ form_row(form.plainPassword) }}

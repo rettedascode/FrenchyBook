@@ -12,7 +12,7 @@
             <div class="list-item-body">
                 <a class="list-item-title" href="{{ path('admin_user_show', {id: user.id}) }}">{{ user.name }}</a>
                 {% if user.admin %}<span class="badge badge-admin">{{ 'admin.users.is_admin'|trans }}</span>{% endif %}
-                <div class="list-item-meta">{{ user.fullName }}{% if user.district %} · {{ user.district|trans }}{% endif %}</div>
+                <div class="list-item-meta">{{ user.fullName }}{% if user.locationLabel %} · {{ user.locationLabel }}{% endif %}</div>
                 <div class="list-item-meta">{{ user.email }}</div>
                 <div class="list-item-meta">
                     {{ 'admin.users.book_count'|trans({count: bookCounts[user.id] ?? 0}) }}

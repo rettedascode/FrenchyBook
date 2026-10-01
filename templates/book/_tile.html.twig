@@ -4,11 +4,13 @@
         <div class="book-tile-title">{{ book.title }}</div>
         {% if book.authorNames %}<div class="book-tile-author">{{ book.authorNames }}</div>{% endif %}
         {% set tile_loan = activeLoans[book.id] ?? null %}
-        {% set tile_district = tile_loan and tile_loan.handedOver ? tile_loan.borrower.district : book.owner.district %}
+        {% set tile_holder = tile_loan and tile_loan.handedOver ? tile_loan.borrower : book.owner %}
+        {# Auf der Kachel nur der Stadtteil (kurz), sonst der Bezirk #}
+        {% set tile_district = tile_holder.quarter ? tile_holder.quarter.label : (tile_holder.district ? tile_holder.district|trans : null) %}
         {% if book.rating or tile_district %}
             <div class="book-tile-meta">
                 {% if book.rating %}{{ include('book/_stars.html.twig', {rating: book.rating}) }}{% endif %}
-                {% if tile_district %}<span class="book-tile-district">{{ icon('map-pin') }}{{ tile_district|trans }}</span>{% endif %}
+                {% if tile_district %}<span class="book-tile-district">{{ icon('map-pin') }}{{ tile_district }}</span>{% endif %}
             </div>
         {% endif %}
         {{ include('book/_status_badge.html.twig', {loan: tile_loan}) }}

@@ -30,6 +30,8 @@ user:
     too_long: 'Der Nachname darf höchstens 50 Zeichen haben.'
   district:
     not_blank: 'Bitte wähle deinen Kölner Bezirk aus.'
+  quarter:
+    not_blank: 'Bitte wähle deinen Kölner Stadtteil aus.'
 
 book:
   title:

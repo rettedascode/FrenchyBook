@@ -10,7 +10,7 @@
         <span class="avatar avatar-lg" style="--av: {{ avatar_color(app.user) }}" aria-hidden="true">{{ app.user.initial }}</span>
         <div>
             <h1>{{ app.user.name }}</h1>
-            <p class="subtle">{% if app.user.firstName %}{{ app.user.fullName }} · {% endif %}{% if app.user.district %}{{ icon('map-pin', 'icon-sm inline-icon') }} {{ app.user.district|trans }} · {% endif %}{{ 'profile.member_since'|trans({date: app.user.createdAt|ldate}) }}</p>
+            <p class="subtle">{% if app.user.firstName %}{{ app.user.fullName }} · {% endif %}{% if app.user.locationLabel %}{{ icon('map-pin', 'icon-sm inline-icon') }} {{ app.user.locationLabel }} · {% endif %}{{ 'profile.member_since'|trans({date: app.user.createdAt|ldate}) }}</p>
         </div>
     </div>
 
@@ -58,7 +58,7 @@
                     {{ form_row(profileForm.firstName) }}
                     {{ form_row(profileForm.lastName) }}
                 </div>
-                {{ form_row(profileForm.district) }}
+                {{ form_row(profileForm.quarter, {attr: {'data-searchable-select-search-value': 'quarter.search'|trans, 'data-searchable-select-empty-value': 'quarter.no_match'|trans}}) }}
                 {{ form_row(profileForm.name) }}
                 {{ form_row(profileForm.email) }}
                 <button type="submit" class="btn btn-primary btn-block">{{ 'profile.save'|trans }}</button>

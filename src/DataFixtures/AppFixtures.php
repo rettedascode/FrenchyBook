@@ -10,7 +10,7 @@ use App\Entity\LoanRequest;
 use App\Entity\User;
 use App\Enum\BookCondition;
 use App\Enum\BookFormat;
-use App\Enum\District;
+use App\Enum\Quarter;
 use App\Service\CoverManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -57,14 +57,14 @@ class AppFixtures extends Fixture
         $users = [];
         // Sophie nutzt die App auf Französisch
         foreach ([
-            'jeremy' => ['Jeremy', 'jeremy@example.com', ['ROLE_ADMIN'], 'de', 'Thelen', District::Ehrenfeld],
-            'lena' => ['Lena', 'lena@example.com', [], 'de', 'Schmitz', District::Nippes],
-            'max' => ['Max', 'max@example.com', [], 'de', 'Becker', District::Innenstadt],
-            'sophie' => ['Sophie', 'sophie@example.com', [], 'fr', 'Martin', District::Lindenthal],
-            'tom' => ['Tom', 'tom@example.com', [], 'de', 'Wagner', District::Kalk],
-        ] as $key => [$name, $email, $roles, $locale, $lastName, $district]) {
+            'jeremy' => ['Jeremy', 'jeremy@example.com', ['ROLE_ADMIN'], 'de', 'Dupont', Quarter::Bickendorf],
+            'lena' => ['Lena', 'lena@example.com', [], 'de', 'Schmitz', Quarter::Riehl],
+            'max' => ['Max', 'max@example.com', [], 'de', 'Becker', Quarter::AltstadtSued],
+            'sophie' => ['Sophie', 'sophie@example.com', [], 'fr', 'Martin', Quarter::Suelz],
+            'tom' => ['Tom', 'tom@example.com', [], 'de', 'Wagner', Quarter::Kalk],
+        ] as $key => [$name, $email, $roles, $locale, $lastName, $quarter]) {
             $user = (new User())->setName($name)->setEmail($email)->setRoles($roles)->setLocale($locale)
-                ->setFirstName($name)->setLastName($lastName)->setDistrict($district);
+                ->setFirstName($name)->setLastName($lastName)->setQuarter($quarter);
             $user->setPassword($this->hasher->hashPassword($user, self::PASSWORD));
             $manager->persist($user);
             $users[$key] = $user;

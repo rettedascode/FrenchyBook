@@ -1775,3 +1775,32 @@ turbo-frame[aria-busy="true"] .result-meta { opacity: .55; transition: opacity .
 .admin-guides li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius); background: var(--surface-2); }
 .admin-guide-name { flex: 1 1 180px; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
 .admin-guide-name .subtle { display: block; font-weight: 400; }
+
+/* ---------- 32. Auswahl mit Suchfeld (Kölner Stadtteile) ---------- */
+.ss-native { position: absolute !important; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); pointer-events: none; }
+.ss { position: relative; }
+.ss-toggle {
+    display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: var(--tap);
+    padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text); font: inherit; font-size: 1rem; text-align: left; cursor: pointer;
+}
+.ss-toggle:focus-visible, .ss-toggle[aria-expanded="true"] { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+.ss-toggle.is-placeholder .ss-value { color: var(--text-subtle); }
+.ss-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ss-chevron { width: 18px; height: 18px; flex: none; color: var(--text-subtle); transition: transform .15s; }
+.ss-toggle[aria-expanded="true"] .ss-chevron { transform: rotate(180deg); }
+.ss-panel {
+    position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 50;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg);
+    padding: var(--space-2); display: grid; gap: var(--space-2);
+}
+.form .ss-panel input.ss-search { min-height: 44px; }
+.ss-list { list-style: none; margin: 0; padding: 0; max-height: 280px; overflow-y: auto; overscroll-behavior: contain; }
+.ss-group {
+    position: sticky; top: 0; z-index: 1; padding: 6px 10px 4px;
+    background: var(--surface); color: var(--text-subtle); font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+}
+.ss-option { padding: 10px 12px; min-height: 44px; display: flex; align-items: center; border-radius: var(--radius-sm); cursor: pointer; }
+.ss-option.is-active { background: var(--accent-soft); }
+.ss-option[aria-selected="true"] { font-weight: 700; color: var(--accent); }
+.ss-empty { padding: 12px; color: var(--text-muted); }

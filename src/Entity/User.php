@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\District;
+use App\Enum\Quarter;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -65,7 +66,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 50, maxMessage: 'user.last_name.too_long')]
     private ?string $lastName = null;
 
-    /** Kölner Stadtbezirk – ungefährer Abholort der eigenen Bücher */
+    /** Kölner Stadtteil (offizielle Nummer) – der Bezirk ergibt sich daraus */
+    #[ORM\Column(type: Types::SMALLINT, nullable: true, enumType: Quarter::class)]
+    #[Assert\NotNull(message: 'user.quarter.not_blank')]
+    private ?Quarter $quarter = null;
+
+    /** Kölner Stadtbezirk – ungefährer Abholort der eigenen Bücher (wird aus dem Stadtteil gesetzt) */
     #[ORM\Column(length: 20, nullable: true, enumType: District::class)]
     #[Assert\NotNull(message: 'user.district.not_blank')]
     private ?District $district = null;
@@ -186,6 +192,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return '' !== $full ? $full : (string) $this->name;
     }
 
+    public function getQuarter(): ?Quarter
+    {
+        return $this->quarter;
+    }
+
+    public function setQuarter(?Quarter $quarter): static
+    {
+        $this->quarter = $quarter;
+        if (null !== $quarter) {
+            $this->district = $quarter->district();
+        }
+
+        return $this;
+    }
+
+    /** „Bickendorf (Ehrenfeld)“ – oder nur der Bezirk, solange kein Stadtteil gewählt ist */
+    public function getLocationLabel(): string
+    {
+        if (null !== $this->quarter) {
+            $district = $this->quarter->district()->label();
+
+            return $this->quarter->label() === $district ? $district : $this->quarter->label().' ('.$district.')';
+        }
+
+        return $this->district?->label() ?? '';
+    }
+
     public function getDistrict(): ?District
     {
         return $this->district;
@@ -201,7 +234,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** Fehlen Angaben aus der Registrierung (ältere Konten)? */
     public function isProfileIncomplete(): bool
     {
-        return null === $this->firstName || null === $this->lastName || null === $this->district;
+        return null === $this->firstName || null === $this->lastName || null === $this->quarter;
     }
 
     public function isAdmin(): bool

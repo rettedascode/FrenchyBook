@@ -99,6 +99,9 @@ register:
   district: 'Kölner Bezirk'
   district_help: 'Zeigt den anderen, wo sie deine Bücher ungefähr abholen können.'
   district_placeholder: 'Bitte auswählen …'
+  quarter: 'Kölner Stadtteil'
+  quarter_help: 'Zeigt den anderen, wo sie deine Bücher ungefähr abholen können.'
+  quarter_placeholder: 'Stadtteil wählen …'
 
 status:
   available: 'Verfügbar'
@@ -384,7 +387,7 @@ dashboard:
   my_requests: 'Deine Anfragen'
   requested_at: '{when} angefragt bei'
   complete_profile_title: 'Fast fertig!'
-  complete_profile_text: 'Ergänze bitte Vorname, Nachname und deinen Kölner Bezirk, damit die anderen wissen, wo sie Bücher abholen können.'
+  complete_profile_text: 'Ergänze bitte Vorname, Nachname und deinen Kölner Stadtteil, damit die anderen wissen, wo sie Bücher abholen können.'
   complete_profile_link: 'Zum Profil'
   waitlist: 'Deine Warteliste'
   waitlist_available: 'Wieder da! Frag jetzt bei {name} an.'
@@ -849,3 +852,7 @@ waitlist:
     own_book: 'Auf die Warteliste für dein eigenes Buch musst du dich nicht setzen. 🙂'
     available: 'Das Buch ist gerade frei – du kannst es direkt anfragen.'
     has_it: 'Du hast das Buch doch gerade. 🙂'
+
+quarter:
+  search: 'Stadtteil oder Bezirk suchen …'
+  no_match: 'Kein Stadtteil gefunden'

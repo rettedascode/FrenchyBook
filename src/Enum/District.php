@@ -21,6 +21,21 @@ enum District: string implements TranslatableInterface
     case Kalk = 'kalk';
     case Muelheim = 'muelheim';
 
+    public function label(): string
+    {
+        return match ($this) {
+            self::Innenstadt => 'Innenstadt',
+            self::Rodenkirchen => 'Rodenkirchen',
+            self::Lindenthal => 'Lindenthal',
+            self::Ehrenfeld => 'Ehrenfeld',
+            self::Nippes => 'Nippes',
+            self::Chorweiler => 'Chorweiler',
+            self::Porz => 'Porz',
+            self::Kalk => 'Kalk',
+            self::Muelheim => 'Mülheim',
+        };
+    }
+
     /** {{ user.district|trans }} */
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {

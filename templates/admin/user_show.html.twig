@@ -19,7 +19,7 @@
     <div class="profile-head">
         <span class="avatar avatar-lg" style="--av: {{ avatar_color(user) }}" aria-hidden="true">{{ user.initial }}</span>
         <div>
-            <p style="margin:0">{{ user.fullName }}{% if user.district %} · {{ icon('map-pin', 'icon-sm inline-icon') }} {{ user.district|trans }}{% endif %}</p>
+            <p style="margin:0">{{ user.fullName }}{% if user.locationLabel %} · {{ icon('map-pin', 'icon-sm inline-icon') }} {{ user.locationLabel }}{% endif %}</p>
             <p style="margin:0"><strong>{{ user.email }}</strong>
                 {% if user.admin %}<span class="badge badge-admin">{{ 'admin.users.is_admin'|trans }}</span>{% endif %}</p>
             <p class="subtle" style="margin:0">
@@ -48,7 +48,7 @@
                 {{ form_row(form.firstName) }}
                 {{ form_row(form.lastName) }}
             </div>
-            {{ form_row(form.district) }}
+            {{ form_row(form.quarter, {attr: {'data-searchable-select-search-value': 'quarter.search'|trans, 'data-searchable-select-empty-value': 'quarter.no_match'|trans}}) }}
             {{ form_row(form.name) }}
             {{ form_row(form.email) }}
             {{ form_row(form.locale) }}

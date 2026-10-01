@@ -108,7 +108,7 @@
                     <div class="list-item-body">
                         <a class="list-item-title" href="{{ path('app_book_show', {id: loan.book.id}) }}">{{ loan.book.title }}</a>
                         {% if not loan.handedOver %}
-                            <div class="list-item-meta">{{ 'loan.pickup_at'|trans({name: loan.book.owner.name, district: loan.book.owner.district ? loan.book.owner.district|trans : '–'}) }}</div>
+                            <div class="list-item-meta">{{ 'loan.pickup_at'|trans({name: loan.book.owner.name, district: loan.book.owner.locationLabel ?: '–'}) }}</div>
                             <span class="badge badge-reserved">{{ 'status.reserved_me'|trans }}</span>
                         {% else %}
                             <div class="list-item-meta">{{ 'dashboard.from'|trans }} <strong>{{ loan.book.owner.name }}</strong> · {{ loan.lentAt|since }}</div>
