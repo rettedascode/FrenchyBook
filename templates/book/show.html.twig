@@ -25,6 +25,7 @@
                             <div class="cover"><img src="{{ back|imagine_filter('cover_large') }}" alt="{{ 'cover.back_alt'|trans({title: book.title}) }}" decoding="async"></div>
                         </div>
                     </div>
+                    <p class="book-flip-hint">{{ icon('hand', 'icon-sm') }} <span>{{ 'book.show.flip_hint'|trans }}</span></p>
                     <button type="button" class="btn btn-ghost btn-sm book-flip-button" data-action="book-flip#toggle">
                         {{ icon('refresh', 'icon-sm') }} <span data-book-flip-target="label">{{ 'book.show.side_back'|trans }}</span>
                     </button>

@@ -295,6 +295,7 @@ book:
     cover_sides: 'Vorder- oder Rückseite anzeigen'
     flip_back: 'Zurück'
     flip_label: 'Buch umdrehen'
+    flip_hint: 'Tippe aufs Buch, um die Rückseite zu sehen'
   rating:
     stars: '{count, plural, one {# Stern} other {# Sterne}}'
     clear: 'Keine Bewertung'

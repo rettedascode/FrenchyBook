@@ -296,6 +296,7 @@ book:
     cover_sides: 'Afficher la couverture ou la quatrième de couverture'
     flip_back: 'Retour'
     flip_label: 'Retourner le livre'
+    flip_hint: 'Touche le livre pour voir la quatrième de couverture'
   rating:
     stars: '{count, plural, one {# étoile} other {# étoiles}}'
     clear: 'Pas de note'
