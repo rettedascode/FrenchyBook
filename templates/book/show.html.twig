@@ -14,16 +14,23 @@
 <article class="book-detail">
     <div class="book-detail-aside">
         {% set back = back_path(book) %}
-        <div class="book-detail-cover"{% if back %} data-controller="cover-switch"{% endif %}>
-            <div data-cover-switch-target="panel">{{ include('book/_cover.html.twig', {book: book, size: 'large', eager: true}) }}</div>
+        <div class="book-detail-cover">
             {% if back %}
-                <div data-cover-switch-target="panel" hidden>
-                    <div class="cover"><img src="{{ back|imagine_filter('cover_large') }}" alt="{{ 'cover.back_alt'|trans({title: book.title}) }}" loading="lazy" decoding="async"></div>
+                {# Tippen aufs Buch dreht es um und zeigt die Rückseite #}
+                <div class="book-flip" data-controller="book-flip" data-book-flip-front-value="{{ 'book.show.back'|trans }}" data-book-flip-back-value="{{ 'book.show.flip_back'|trans }}">
+                    <div class="book-flip-inner" role="button" tabindex="0" aria-pressed="false" aria-label="{{ 'book.show.flip_label'|trans }}"
+                         data-book-flip-target="inner" data-action="click->book-flip#toggle keydown.enter->book-flip#toggle keydown.space->book-flip#toggle:prevent">
+                        <div class="book-flip-face book-flip-front">{{ include('book/_cover.html.twig', {book: book, size: 'large', eager: true}) }}</div>
+                        <div class="book-flip-face book-flip-back">
+                            <div class="cover"><img src="{{ back|imagine_filter('cover_large') }}" alt="{{ 'cover.back_alt'|trans({title: book.title}) }}" decoding="async"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-ghost btn-sm book-flip-button" data-action="book-flip#toggle">
+                        {{ icon('refresh', 'icon-sm') }} <span data-book-flip-target="label">{{ 'book.show.back'|trans }}</span>
+                    </button>
                 </div>
-                <div class="cover-switch" role="group" aria-label="{{ 'book.show.cover_sides'|trans }}">
-                    <button type="button" class="chip is-active" aria-pressed="true" data-cover-switch-target="button" data-action="cover-switch#show" data-cover-switch-index-param="0">{{ 'book.show.front'|trans }}</button>
-                    <button type="button" class="chip" aria-pressed="false" data-cover-switch-target="button" data-action="cover-switch#show" data-cover-switch-index-param="1">{{ 'book.show.back'|trans }}</button>
-                </div>
+            {% else %}
+                {{ include('book/_cover.html.twig', {book: book, size: 'large', eager: true}) }}
             {% endif %}
         </div>
     </div>

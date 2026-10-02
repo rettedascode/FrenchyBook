@@ -1817,7 +1817,17 @@ turbo-frame[aria-busy="true"] .result-meta { opacity: .55; transition: opacity .
 }
 .cover-slot svg { width: 26px; height: 26px; }
 .has-error .cover-slot { border-color: var(--danger); color: var(--danger); }
-.cover-switch { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-3); }
+/* Buch umdrehen (Buchseite) */
+.book-flip { display: grid; justify-items: center; gap: var(--space-2); }
+.book-flip-inner { position: relative; width: 100%; cursor: pointer; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.3, .7, .3, 1); perspective: 1200px; border-radius: 10px; }
+.book-flip-inner:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+.book-flip.is-flipped .book-flip-inner { transform: rotateY(180deg); }
+.book-flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.book-flip-back { position: absolute; inset: 0; transform: rotateY(180deg); }
+.book-flip-back .cover { height: 100%; }
+.book-flip-button .icon { transition: transform .4s; }
+.book-flip.is-flipped .book-flip-button .icon { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .book-flip-inner { transition: none; } }
 
 /* ---------- 34. Kachel: Eigentümer ---------- */
 .book-tile-owner { display: flex; align-items: center; gap: 4px; margin-top: 4px; min-width: 0; font-size: var(--fs-xs); color: var(--text-muted); }

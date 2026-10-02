@@ -292,6 +292,8 @@ book:
     review_mine: 'Dein Kommentar'
     front: 'Vorderseite'
     cover_sides: 'Vorder- oder Rückseite anzeigen'
+    flip_back: 'Zurück'
+    flip_label: 'Buch umdrehen'
   rating:
     stars: '{count, plural, one {# Stern} other {# Sterne}}'
     clear: 'Keine Bewertung'

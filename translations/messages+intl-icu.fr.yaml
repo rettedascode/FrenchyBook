@@ -293,6 +293,8 @@ book:
     review_mine: 'Ton commentaire'
     front: 'Couverture'
     cover_sides: 'Afficher la couverture ou la quatrième de couverture'
+    flip_back: 'Retour'
+    flip_label: 'Retourner le livre'
   rating:
     stars: '{count, plural, one {# étoile} other {# étoiles}}'
     clear: 'Pas de note'
