@@ -59,8 +59,10 @@
                         <div data-cover-preview-target="frame">
                             {% if remote_cover %}
                                 <div class="cover"><img src="{{ remote_cover }}" alt="{{ 'cover.suggestion_alt'|trans }}" data-action="error->cover-preview#remoteFailed" referrerpolicy="no-referrer"></div>
-                            {% else %}
+                            {% elseif book.coverImage %}
                                 {{ include('book/_cover.html.twig', {book: book, size: 'mini', decorative: true}) }}
+                            {% else %}
+                                <div class="cover-slot" aria-hidden="true">{{ icon('camera') }}<span>{{ 'book.show.front'|trans }}</span></div>
                             {% endif %}
                         </div>
                         {% set has_cover = book.coverImage or remote_cover %}
@@ -116,7 +118,7 @@
                             {% if back %}
                                 <div class="cover"><img src="{{ back|imagine_filter('cover_mini') }}" alt="{{ 'cover.back_alt'|trans({title: book.title}) }}"></div>
                             {% else %}
-                                <div class="cover cover-placeholder cover-back-empty" aria-hidden="true">{{ icon('image') }}</div>
+                                <div class="cover-slot" aria-hidden="true">{{ icon('camera') }}<span>{{ 'book.show.back'|trans }}</span></div>
                             {% endif %}
                         </div>
                         <div class="cover-field-actions">
