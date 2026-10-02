@@ -137,6 +137,7 @@ cover:
     preview_alt: 'Aperçu de la couverture choisie'
     not_found: 'Aucune couverture trouvée'
     not_found_hint: 'Aucune couverture trouvée – prends simplement le livre en photo.'
+    preview_alt_back: 'Aperçu de la quatrième de couverture'
   error:
     upload: 'L’image n’a pas pu être envoyée. Réessaie.'
     too_large: 'L’image est trop grande. Choisis une image de 5 Mo maximum.'
@@ -144,6 +145,9 @@ cover:
     unreadable: 'L’image n’a pas pu être lue. Essaie avec une autre photo.'
     too_many_pixels: 'L’image a trop de pixels. Choisis une photo plus petite.'
     processing: 'L’image n’a pas pu être traitée. Essaie avec une autre photo.'
+  required: 'Prends une photo de la couverture du livre.'
+  back_hint: 'Par exemple avec le résumé.'
+  back_alt: 'Quatrième de couverture de « {title} »'
 
 books:
   search_label: 'Rechercher par titre, auteur ou ISBN'
@@ -234,7 +238,7 @@ book:
     title: 'Titre'
     authors: 'Auteur'
     authors_help: 'Sépare plusieurs auteurs par une virgule.'
-    cover: 'Couverture'
+    cover: 'Photo de la couverture'
     remove_cover: 'Supprimer la couverture'
     subtitle: 'Sous-titre'
     isbn: 'ISBN'
@@ -263,8 +267,10 @@ book:
     review_placeholder: 'par ex. « Magnifiquement écrit, parfait pour les vacances. »'
     awards: 'Prix et distinctions'
     awards_placeholder: 'par ex. Prix Goncourt 2016'
+    back_cover: 'Photo de la quatrième de couverture'
+    remove_back: 'Supprimer la photo de la quatrième de couverture'
   show:
-    back: 'Tous les livres'
+    back: 'Quatrième'
     all_by_author: 'Tous les livres de {name}'
     loan_section: 'Prêt'
     your_book: 'Ton livre'
@@ -282,6 +288,8 @@ book:
     delete_confirm: '« {title} » sera supprimé définitivement, avec son historique et ses demandes.'
     review_by: 'Commentaire de {name}'
     review_mine: 'Ton commentaire'
+    front: 'Couverture'
+    cover_sides: 'Afficher la couverture ou la quatrième de couverture'
   rating:
     stars: '{count, plural, one {# étoile} other {# étoiles}}'
     clear: 'Pas de note'

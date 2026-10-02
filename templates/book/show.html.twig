@@ -13,8 +13,18 @@
 
 <article class="book-detail">
     <div class="book-detail-aside">
-        <div class="book-detail-cover">
-            {{ include('book/_cover.html.twig', {book: book, size: 'large', eager: true}) }}
+        {% set back = back_path(book) %}
+        <div class="book-detail-cover"{% if back %} data-controller="cover-switch"{% endif %}>
+            <div data-cover-switch-target="panel">{{ include('book/_cover.html.twig', {book: book, size: 'large', eager: true}) }}</div>
+            {% if back %}
+                <div data-cover-switch-target="panel" hidden>
+                    <div class="cover"><img src="{{ back|imagine_filter('cover_large') }}" alt="{{ 'cover.back_alt'|trans({title: book.title}) }}" loading="lazy" decoding="async"></div>
+                </div>
+                <div class="cover-switch" role="group" aria-label="{{ 'book.show.cover_sides'|trans }}">
+                    <button type="button" class="chip is-active" aria-pressed="true" data-cover-switch-target="button" data-action="cover-switch#show" data-cover-switch-index-param="0">{{ 'book.show.front'|trans }}</button>
+                    <button type="button" class="chip" aria-pressed="false" data-cover-switch-target="button" data-action="cover-switch#show" data-cover-switch-index-param="1">{{ 'book.show.back'|trans }}</button>
+                </div>
+            {% endif %}
         </div>
     </div>
 

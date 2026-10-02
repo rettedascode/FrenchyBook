@@ -54,7 +54,7 @@
                         notFound: 'cover.js.not_found'|trans,
                         notFoundHint: 'cover.js.not_found_hint'|trans,
                      }|json_encode }}">
-                    <span class="form-label">{{ 'book.field.cover'|trans }}</span>
+                    <span class="form-label">{{ 'book.field.cover'|trans }} <span class="required-mark">*</span></span>
                     <div class="cover-field">
                         <div data-cover-preview-target="frame">
                             {% if remote_cover %}
@@ -94,6 +94,53 @@
                     {{ form_errors(form.coverFile) }}
                     <ul data-cover-preview-target="error" class="form-errors" role="alert" hidden></ul>
                     {{ form_widget(form.coverUrl) }}
+                </div>
+
+                {# Rückseite: optional, gleiche Bedienung wie vorne #}
+                <div class="form-row{{ form.backFile.vars.errors|length ? ' has-error' }}" data-controller="cover-preview"
+                     data-cover-preview-messages-value="{{ {
+                        format: 'cover.js.format'|trans,
+                        tooLarge: 'cover.js.too_large'|trans,
+                        preparing: 'cover.js.preparing'|trans,
+                        otherPhoto: 'cover.other_photo'|trans,
+                        takePhoto: 'cover.take_photo'|trans,
+                        willUpload: 'cover.js.will_upload'|trans,
+                        previewAlt: 'cover.js.preview_alt_back'|trans,
+                        notFound: 'cover.js.not_found'|trans,
+                        notFoundHint: 'cover.js.not_found_hint'|trans,
+                     }|json_encode }}">
+                    <span class="form-label">{{ 'book.field.back_cover'|trans }} <span class="disclosure-hint">– {{ 'book.form.optional'|trans }}</span></span>
+                    <div class="cover-field">
+                        <div data-cover-preview-target="frame">
+                            {% set back = back_path(book) %}
+                            {% if back %}
+                                <div class="cover"><img src="{{ back|imagine_filter('cover_mini') }}" alt="{{ 'cover.back_alt'|trans({title: book.title}) }}"></div>
+                            {% else %}
+                                <div class="cover cover-placeholder cover-back-empty" aria-hidden="true">{{ icon('image') }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="cover-field-actions">
+                            {{ form_widget(form.backFile, {attr: {class: 'cover-input', tabindex: '-1', 'aria-describedby': form.backFile.vars.id ~ '_help'}}) }}
+                            <button type="button" class="btn btn-secondary only-touch" data-action="cover-preview#takePhoto">
+                                {{ icon('camera') }}
+                                <span data-cover-preview-target="label">{{ (back ? 'cover.other_photo' : 'cover.take_photo')|trans }}</span>
+                            </button>
+                            <button type="button" class="btn btn-ghost btn-sm only-touch" data-action="cover-preview#pickFromGallery">
+                                {{ icon('image', 'icon-sm') }} {{ 'cover.from_gallery'|trans }}
+                            </button>
+                            <button type="button" class="btn btn-secondary only-pointer" data-action="cover-preview#pickFromGallery">
+                                {{ icon('image') }} <span>{{ 'cover.choose_image'|trans }}</span>
+                            </button>
+                            <p class="form-help" id="{{ form.backFile.vars.id }}_help" data-cover-preview-target="hint">{{ 'cover.back_hint'|trans }}</p>
+                            {% if form.removeBack is defined %}
+                                <label class="checkbox-row small" for="{{ form.removeBack.vars.id }}" style="min-height:40px">
+                                    {{ form_widget(form.removeBack) }} <span>{{ 'book.field.remove_back'|trans }}</span>
+                                </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {{ form_errors(form.backFile) }}
+                    <ul data-cover-preview-target="error" class="form-errors" role="alert" hidden></ul>
                 </div>
 
                 {{ form_row(form.title, {attr: (book.title is empty ? {'data-autofocus': true} : {})}) }}

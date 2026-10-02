@@ -74,6 +74,31 @@ class BookType extends AbstractType
                     ),
                 ],
             ])
+            // --- Rückseite (optional) ---
+            ->add('backFile', FileType::class, [
+                'label' => 'book.field.back_cover',
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'accept' => 'image/jpeg,image/png,image/webp',
+                    'data-cover-preview-target' => 'input',
+                    'data-action' => 'change->cover-preview#preview',
+                ],
+                'constraints' => [
+                    new Assert\Image(
+                        maxSize: CoverManager::MAX_UPLOAD_BYTES,
+                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                        maxSizeMessage: 'cover.too_large',
+                        mimeTypesMessage: 'cover.format',
+                        uploadIniSizeErrorMessage: 'cover.too_large_simple',
+                        uploadFormSizeErrorMessage: 'cover.too_large_simple',
+                        uploadErrorMessage: 'cover.upload_failed',
+                        corruptedMessage: 'cover.corrupted',
+                        maxPixels: 40_000_000,
+                        maxPixelsMessage: 'cover.too_many_pixels',
+                    ),
+                ],
+            ])
             // Von Open Library vorgeschlagenes Cover – wird erst beim Speichern heruntergeladen
             ->add('coverUrl', HiddenType::class, [
                 'mapped' => false,
@@ -196,9 +221,10 @@ class BookType extends AbstractType
             ]);
         }
 
-        if ($options['allow_remove_cover']) {
-            $builder->add('removeCover', CheckboxType::class, [
-                'label' => 'book.field.remove_cover',
+        // Die Vorderseite ist Pflicht – entfernen lässt sich nur die Rückseite
+        if ($options['allow_remove_back']) {
+            $builder->add('removeBack', CheckboxType::class, [
+                'label' => 'book.field.remove_back',
                 'mapped' => false,
                 'required' => false,
             ]);
@@ -209,7 +235,7 @@ class BookType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Book::class,
-            'allow_remove_cover' => false,
+            'allow_remove_back' => false,
             // Admins, die ein fremdes Buch korrigieren, sehen die private Notiz nicht
             'show_owner_note' => true,
         ]);

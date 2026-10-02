@@ -219,7 +219,7 @@ class BookController extends AbstractController
     public function edit(Request $request, Book $book): Response
     {
         $form = $this->createForm(BookType::class, $book, [
-            'allow_remove_cover' => null !== $book->getCoverImage(),
+            'allow_remove_back' => null !== $book->getBackImage(),
             'show_owner_note' => $book->isOwnedBy($this->getUser()),
         ]);
         $form->handleRequest($request);
@@ -250,11 +250,13 @@ class BookController extends AbstractController
 
         $title = $book->getTitle();
         $cover = $book->getCoverImage();
+        $back = $book->getBackImage();
         $ownBook = $book->isOwnedBy($this->getUser());
 
         $this->em->remove($book);
         $this->em->flush();
         $this->covers->remove($cover);
+        $this->covers->remove($back);
 
         $this->addFlash('success', new TranslatableMessage('flash.book.deleted', ['title' => $title]));
 
@@ -272,21 +274,25 @@ class BookController extends AbstractController
      * Verarbeitet Upload, Open-Library-Cover oder „Cover entfernen“.
      * Gibt false zurück, wenn das Bild nicht verarbeitet werden konnte (Fehler steht dann am Feld).
      */
+    /**
+     * Vorderseite (Pflicht) und Rückseite (optional) speichern.
+     * Schlägt etwas fehl, bleiben die alten Bilder unverändert und neu gespeicherte Dateien werden wieder entfernt.
+     */
     private function handleCover(FormInterface $form, Book $book): bool
     {
         $upload = $form->get('coverFile')->getData();
         $remoteUrl = trim((string) $form->get('coverUrl')->getData());
-        $remove = $form->has('removeCover') && true === $form->get('removeCover')->getData();
+        $backUpload = $form->get('backFile')->getData();
+        $removeBack = $form->has('removeBack') && true === $form->get('removeBack')->getData();
         $oldCover = $book->getCoverImage();
+        $oldBack = $book->getBackImage();
+        $stored = [];
 
         try {
             if ($upload instanceof UploadedFile) {
-                $book->setCoverImage($this->covers->storeUpload($upload));
-            } elseif ('' !== $remoteUrl) {
-                // Schlägt der Download fehl, bekommt das Buch eben den hübschen Platzhalter.
-                $book->setCoverImage($this->covers->storeFromUrl($remoteUrl) ?? $oldCover);
-            } elseif ($remove) {
-                $book->setCoverImage(null);
+                $book->setCoverImage($stored[] = $this->covers->storeUpload($upload));
+            } elseif ('' !== $remoteUrl && null !== ($remote = $this->covers->storeFromUrl($remoteUrl))) {
+                $book->setCoverImage($stored[] = $remote);
             }
         } catch (CoverException $e) {
             $form->get('coverFile')->addError(new FormError($e->toMessage()->trans($this->translator)));
@@ -294,8 +300,33 @@ class BookController extends AbstractController
             return false;
         }
 
-        if (null !== $oldCover && $oldCover !== $book->getCoverImage()) {
-            $this->covers->remove($oldCover);
+        // Ohne Foto der Vorderseite geht es nicht
+        if (null === $book->getCoverImage()) {
+            $form->get('coverFile')->addError(new FormError($this->translator->trans('cover.required')));
+
+            return false;
+        }
+
+        try {
+            if ($backUpload instanceof UploadedFile) {
+                $book->setBackImage($stored[] = $this->covers->storeUpload($backUpload));
+            } elseif ($removeBack) {
+                $book->setBackImage(null);
+            }
+        } catch (CoverException $e) {
+            $form->get('backFile')->addError(new FormError($e->toMessage()->trans($this->translator)));
+            foreach ($stored as $file) {
+                $this->covers->remove($file);
+            }
+            $book->setCoverImage($oldCover)->setBackImage($oldBack);
+
+            return false;
+        }
+
+        foreach ([[$oldCover, $book->getCoverImage()], [$oldBack, $book->getBackImage()]] as [$old, $new]) {
+            if (null !== $old && $old !== $new) {
+                $this->covers->remove($old);
+            }
         }
 
         return true;

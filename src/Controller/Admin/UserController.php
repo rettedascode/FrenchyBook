@@ -127,7 +127,11 @@ class UserController extends AbstractAdminController
         }
 
         $name = $user->getName();
-        $coverFiles = array_filter(array_map(static fn ($b) => $b->getCoverImage(), $books->findBy(['owner' => $user])));
+        $coverFiles = [];
+        foreach ($books->findBy(['owner' => $user]) as $b) {
+            array_push($coverFiles, $b->getCoverImage(), $b->getBackImage());
+        }
+        $coverFiles = array_filter($coverFiles);
 
         // Bücher, Ausleihen, Anfragen und Push-Abos hängen per ON DELETE CASCADE am Mitglied
         $this->em->remove($user);

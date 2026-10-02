@@ -136,6 +136,7 @@ cover:
     preview_alt: 'Vorschau des gewählten Covers'
     not_found: 'Kein Cover gefunden'
     not_found_hint: 'Kein Cover gefunden – mach einfach ein Foto vom Buch.'
+    preview_alt_back: 'Vorschau der Rückseite'
   error:
     upload: 'Das Bild konnte nicht hochgeladen werden. Bitte versuch es noch einmal.'
     too_large: 'Das Bild ist zu groß. Bitte wähle ein Bild mit höchstens 5 MB.'
@@ -143,6 +144,9 @@ cover:
     unreadable: 'Das Bild konnte nicht gelesen werden. Bitte versuch es mit einem anderen Foto.'
     too_many_pixels: 'Das Bild hat zu viele Pixel. Bitte wähle ein kleineres Foto.'
     processing: 'Das Bild konnte nicht verarbeitet werden. Bitte versuch es mit einem anderen Foto.'
+  required: 'Bitte mach ein Foto von der Vorderseite des Buchs.'
+  back_hint: 'Zum Beispiel mit dem Klappentext.'
+  back_alt: 'Rückseite von „{title}“'
 
 books:
   search_label: 'Suche nach Titel, Autor oder ISBN'
@@ -233,7 +237,7 @@ book:
     title: 'Titel'
     authors: 'Autor'
     authors_help: 'Mehrere Autoren einfach mit Komma trennen.'
-    cover: 'Cover'
+    cover: 'Foto der Vorderseite'
     remove_cover: 'Cover entfernen'
     subtitle: 'Untertitel'
     isbn: 'ISBN'
@@ -262,8 +266,10 @@ book:
     review_placeholder: 'z. B. „Wunderschön erzählt, perfekt für den Urlaub.“'
     awards: 'Auszeichnungen'
     awards_placeholder: 'z. B. Prix Goncourt 2016'
+    back_cover: 'Foto der Rückseite'
+    remove_back: 'Foto der Rückseite entfernen'
   show:
-    back: 'Alle Bücher'
+    back: 'Rückseite'
     all_by_author: 'Alle Bücher von {name}'
     loan_section: 'Ausleihe'
     your_book: 'Dein Buch'
@@ -281,6 +287,8 @@ book:
     delete_confirm: '„{title}“ wird mit Verlauf und Anfragen endgültig gelöscht.'
     review_by: 'Kommentar von {name}'
     review_mine: 'Dein Kommentar'
+    front: 'Vorderseite'
+    cover_sides: 'Vorder- oder Rückseite anzeigen'
   rating:
     stars: '{count, plural, one {# Stern} other {# Sterne}}'
     clear: 'Keine Bewertung'

@@ -80,6 +80,12 @@ final class AppExtension
         return null !== $book->getCoverImage() ? $this->covers->publicPath($book->getCoverImage()) : null;
     }
 
+    #[AsTwigFunction('back_path')]
+    public function backPath(Book $book): ?string
+    {
+        return null !== $book->getBackImage() ? $this->covers->publicPath($book->getBackImage()) : null;
+    }
+
     #[AsTwigFunction('cover_color')]
     public function coverColor(Book $book): string
     {

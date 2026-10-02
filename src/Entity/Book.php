@@ -43,6 +43,10 @@ class Book
     #[Assert\Count(min: 1, minMessage: 'book.authors.min')]
     private Collection $authors;
 
+    /** Foto der Buchrückseite (optional), ebenfalls in public/uploads/covers */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $backImage = null;
+
     /** Dateiname des Covers in public/uploads/covers (null = Platzhalter). */
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverImage = null;
@@ -331,6 +335,18 @@ class Book
     public function getCoverImage(): ?string
     {
         return $this->coverImage;
+    }
+
+    public function getBackImage(): ?string
+    {
+        return $this->backImage;
+    }
+
+    public function setBackImage(?string $backImage): static
+    {
+        $this->backImage = $backImage;
+
+        return $this;
     }
 
     public function setCoverImage(?string $coverImage): static
