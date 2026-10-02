@@ -250,6 +250,9 @@ a:hover { color: var(--accent-hover); }
     color: var(--accent-contrast);
 }
 .logo-mark svg { width: 19px; height: 19px; }
+/* Logo in Trikolore (Bild) – ohne blauen Hintergrund */
+.logo-mark.logo-mark-fr { background: none; box-shadow: 0 1px 3px rgba(20, 22, 28, .18); }
+.logo-mark-fr img { display: block; width: 100%; height: 100%; }
 .logo em { font-style: italic; color: var(--text); font-weight: 600; }
 
 /* „Frenchy“ in den Farben der Trikolore: Fr (blau) · enc (weiß) · hy (rot) */

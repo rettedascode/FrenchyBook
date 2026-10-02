@@ -10,7 +10,7 @@
  *
  * Bei Änderungen an dieser Datei VERSION erhöhen, dann werden alte Caches aufgeräumt.
  */
-const VERSION = 'fb-2026-09-28-1';
+const VERSION = 'fb-2026-10-02-1';
 const STATIC_CACHE = `${VERSION}-static`;
 const IMAGE_CACHE = `${VERSION}-images`;
 const OFFLINE_URL = '/offline.html';
