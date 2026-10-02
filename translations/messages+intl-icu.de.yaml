@@ -188,6 +188,9 @@ books:
     search_text_query: 'Zu „{query}“ haben wir nichts gefunden.'
     search_text_filter: 'Kein Buch passt zu diesen Filtern.'
     search_hint: 'Probier es mit einem anderen Suchbegriff.'
+  tile:
+    owner: 'von {name}'
+    owner_me: 'Dein Buch'
 
 isbn:
   or_type: 'oder ISBN eintippen'

@@ -189,6 +189,9 @@ books:
     search_text_query: 'Nous n’avons rien trouvé pour « {query} ».'
     search_text_filter: 'Aucun livre ne correspond à ces filtres.'
     search_hint: 'Essaie avec un autre mot-clé.'
+  tile:
+    owner: 'à {name}'
+    owner_me: 'Ton livre'
 
 isbn:
   or_type: 'ou saisis l’ISBN'

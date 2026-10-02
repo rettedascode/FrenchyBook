@@ -3,6 +3,7 @@
         {{ include('book/_cover.html.twig', {book: book, decorative: true, eager: eager ?? false}) }}
         <div class="book-tile-title">{{ book.title }}</div>
         {% if book.authorNames %}<div class="book-tile-author">{{ book.authorNames }}</div>{% endif %}
+        <div class="book-tile-owner">{{ icon('user') }}<span>{{ book.isOwnedBy(app.user) ? 'books.tile.owner_me'|trans : 'books.tile.owner'|trans({name: book.owner.name}) }}</span></div>
         {% set tile_loan = activeLoans[book.id] ?? null %}
         {% set tile_holder = tile_loan and tile_loan.handedOver ? tile_loan.borrower : book.owner %}
         {# Auf der Kachel nur der Stadtteil (kurz), sonst der Bezirk #}
