@@ -273,7 +273,8 @@ book:
     back_cover: 'Photo de la quatrième de couverture'
     remove_back: 'Supprimer la photo de la quatrième de couverture'
   show:
-    back: 'Quatrième'
+    back: 'Retour'
+    side_back: 'Quatrième'
     all_by_author: 'Tous les livres de {name}'
     loan_section: 'Prêt'
     your_book: 'Ton livre'

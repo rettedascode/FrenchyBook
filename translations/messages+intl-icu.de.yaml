@@ -272,7 +272,8 @@ book:
     back_cover: 'Foto der Rückseite'
     remove_back: 'Foto der Rückseite entfernen'
   show:
-    back: 'Rückseite'
+    back: 'Zurück'
+    side_back: 'Rückseite'
     all_by_author: 'Alle Bücher von {name}'
     loan_section: 'Ausleihe'
     your_book: 'Dein Buch'

@@ -118,7 +118,7 @@
                             {% if back %}
                                 <div class="cover"><img src="{{ back|imagine_filter('cover_mini') }}" alt="{{ 'cover.back_alt'|trans({title: book.title}) }}"></div>
                             {% else %}
-                                <div class="cover-slot" aria-hidden="true">{{ icon('camera') }}<span>{{ 'book.show.back'|trans }}</span></div>
+                                <div class="cover-slot" aria-hidden="true">{{ icon('camera') }}<span>{{ 'book.show.side_back'|trans }}</span></div>
                             {% endif %}
                         </div>
                         <div class="cover-field-actions">
