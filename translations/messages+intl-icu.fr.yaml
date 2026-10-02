@@ -428,6 +428,12 @@ profile:
     title: 'Changer le mot de passe'
     current: 'Mot de passe actuel'
     new: 'Nouveau mot de passe'
+  theme:
+    title: 'Apparence'
+    auto: 'Automatique'
+    light: 'Clair'
+    dark: 'Sombre'
+    help: '« Automatique » suit le réglage de ton appareil. Ce choix ne vaut que pour cet appareil.'
 
 enum:
   book_format:

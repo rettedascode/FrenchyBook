@@ -7,6 +7,16 @@
         <meta name="description" content="{{ 'app.description'|trans }}">
         <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
         <meta name="theme-color" content="#121317" media="(prefers-color-scheme: dark)">
+        {# Darstellung (Profil: Automatisch/Hell/Dunkel) – vor dem ersten Zeichnen setzen, damit nichts flackert #}
+        <script>
+            try {
+                var t = localStorage.getItem('frenchybook-theme');
+                if (t === 'light' || t === 'dark') {
+                    document.documentElement.dataset.theme = t;
+                    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = t === 'dark' ? '#121317' : '#f6f5f2'; });
+                }
+            } catch (e) {}
+        </script>
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">

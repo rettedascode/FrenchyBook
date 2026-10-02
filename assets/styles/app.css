@@ -71,7 +71,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --bg: #121317;
         --surface: #1b1d23;
         --surface-2: #23262d;
@@ -103,6 +103,38 @@
         --shadow-lg: 0 10px 40px rgba(0, 0, 0, .5);
     }
 }
+:root[data-theme="dark"] {
+    --bg: #121317;
+    --surface: #1b1d23;
+    --surface-2: #23262d;
+    --border: #30333b;
+    --text: #eceef2;
+    --text-muted: #a9aeb8;
+    --text-subtle: #8d929c;
+
+    --accent: #8eaaff;
+    --accent-hover: #adc2ff;
+    --accent-soft: #232c45;
+    --accent-contrast: #0f1629;
+    --focus: #8eaaff;
+
+    --ok-bg: #16311f;
+    --ok-text: #86e0a5;
+    --ok-dot: #45c877;
+    --warn-bg: #3a2711;
+    --warn-text: #ffc279;
+    --warn-dot: #f5a13c;
+    --danger-bg: #3d1719;
+    --danger-text: #ff9c9f;
+    --danger-dot: #ff6b70;
+    --danger: #e5484d;
+    --danger-hover: #f2676b;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --shadow: 0 1px 3px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, .5);
+}
+
 
 /* ---------- 2. Basis ---------- */
 *, *::before, *::after { box-sizing: border-box; }
@@ -263,12 +295,18 @@ a:hover { color: var(--accent-hover); }
     --flag-outline: #1b2f5c;
 }
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --flag-blue: #4d8dff;   /* heller, damit es auf Dunkel lesbar bleibt */
         --flag-red: #ff4d57;
         --flag-outline: transparent;
     }
 }
+:root[data-theme="dark"] {
+    --flag-blue: #4d8dff;   /* heller, damit es auf Dunkel lesbar bleibt */
+    --flag-red: #ff4d57;
+    --flag-outline: transparent;
+}
+
 .logo-frenchy { letter-spacing: .005em; }
 .flag-blue { color: var(--flag-blue); }
 .flag-red { color: var(--flag-red); }
@@ -1718,6 +1756,8 @@ turbo-frame[aria-busy="true"] .result-meta { opacity: .55; transition: opacity .
 /* ---------- 29. Bibliothèque Frenchie: Sterne, Standort, Warteliste ---------- */
 :root { --star: #e8a200; --star-off: #d6d3cc; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --star: #f5b82e; --star-off: #474a52; } }
+:root[data-theme="dark"] { --star: #f5b82e; --star-off: #474a52; }
+
 
 .inline-icon { display: inline-block; vertical-align: -3px; }
 
@@ -1841,3 +1881,16 @@ turbo-frame[aria-busy="true"] .result-meta { opacity: .55; transition: opacity .
 .book-flip-hint { margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: var(--fs-xs); color: var(--text-subtle); text-align: center; }
 .book-flip-hint svg { flex: none; }
 .book-flip.is-flipped .book-flip-hint { visibility: hidden; }
+
+/* ---------- 35. Darstellung: Automatisch / Hell / Dunkel (Profil) ---------- */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+.theme-choice { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+.theme-choice label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    min-height: 72px; padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); font-weight: 600; font-size: var(--fs-sm); text-align: center; cursor: pointer;
+}
+.theme-choice input { position: absolute; opacity: 0; pointer-events: none; }
+.theme-choice input:checked + label { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.theme-choice input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }

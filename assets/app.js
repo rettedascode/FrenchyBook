@@ -1,4 +1,5 @@
 import './stimulus_bootstrap.js';
+import { applyTheme } from './lib/theme.js';
 import * as Turbo from '@hotwired/turbo';
 import './styles/app.css';
 
@@ -59,3 +60,6 @@ document.addEventListener('turbo:load', () => {
         autofocus.focus({ preventScroll: true });
     }
 });
+
+// Darstellung (Hell/Dunkel) nach jedem Seitenwechsel sicherstellen und den Meta-Tag anpassen
+document.addEventListener('turbo:load', () => applyTheme());

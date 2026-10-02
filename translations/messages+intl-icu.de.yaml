@@ -427,6 +427,12 @@ profile:
     title: 'Passwort ändern'
     current: 'Aktuelles Passwort'
     new: 'Neues Passwort'
+  theme:
+    title: 'Darstellung'
+    auto: 'Automatisch'
+    light: 'Hell'
+    dark: 'Dunkel'
+    help: '„Automatisch“ folgt der Einstellung deines Geräts. Die Wahl gilt nur für dieses Gerät.'
 
 enum:
   book_format:

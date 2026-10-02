@@ -73,6 +73,17 @@
             </div>
         </section>
 
+        <section class="card stack" aria-labelledby="h-theme">
+            <h2 id="h-theme">{{ 'profile.theme.title'|trans }}</h2>
+            <div class="theme-choice" role="radiogroup" aria-labelledby="h-theme" data-controller="theme" data-action="change->theme#change">
+                {% for option in [{v: 'auto', i: 'smartphone'}, {v: 'light', i: 'sun'}, {v: 'dark', i: 'moon'}] %}
+                    <input type="radio" name="theme" id="theme-{{ option.v }}" value="{{ option.v }}"{{ option.v == 'auto' ? ' checked' }}>
+                    <label for="theme-{{ option.v }}">{{ icon(option.i) }}{{ ('profile.theme.' ~ option.v)|trans }}</label>
+                {% endfor %}
+            </div>
+            <p class="form-help" style="margin:0">{{ 'profile.theme.help'|trans }}</p>
+        </section>
+
         <details class="disclosure"{{ passwordForm.vars.submitted ? ' open' }}>
             <summary><span>{{ icon('lock', 'icon-sm') }} {{ 'profile.password.title'|trans }}</span>{{ icon('chevron-down') }}</summary>
             <div class="disclosure-body">
