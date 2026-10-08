@@ -53,6 +53,15 @@ confirm:
   title: 'Wirklich löschen?'
   cancel: 'Abbrechen'
   delete: 'Löschen'
+  title_generic: 'Bist du sicher?'
+  return: 'Ist „{title}“ wieder bei dir? Die Ausleihe wird damit beendet.'
+  handover_owner: 'Hast du {name} das Buch gegeben? Ab jetzt läuft die Leihfrist.'
+  handover_borrower: 'Hast du das Buch bekommen? Ab jetzt läuft die Leihfrist.'
+  waitlist_leave: 'Von der Warteliste für „{title}“ austragen?'
+  request_cancel: 'Deine Anfrage für „{title}“ zurückziehen?'
+  request_accept: 'Anfrage von {name} für „{title}“ annehmen? Das Buch wird für {name} reserviert.'
+  request_decline: 'Anfrage von {name} ablehnen? {name} bekommt eine Nachricht.'
+  owner_change: 'Den Besitzer von „{title}“ wirklich ändern?'
 
 date:
   today: 'heute'

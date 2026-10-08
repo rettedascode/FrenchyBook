@@ -82,7 +82,7 @@
         {# Wiederverwendbarer Bestätigungsdialog (Löschen – oder mit data-confirm-button eigene Beschriftung) #}
         <dialog class="confirm-dialog" id="confirm-dialog" aria-labelledby="confirm-dialog-title">
             <form method="dialog">
-                <h2 id="confirm-dialog-title">{{ 'confirm.title'|trans }}</h2>
+                <h2 id="confirm-dialog-title" data-delete="{{ 'confirm.title'|trans }}" data-generic="{{ 'confirm.title_generic'|trans }}">{{ 'confirm.title'|trans }}</h2>
                 <p id="confirm-dialog-message"></p>
                 <div class="button-group">
                     <button class="btn btn-secondary" value="cancel" autofocus>{{ 'confirm.cancel'|trans }}</button>

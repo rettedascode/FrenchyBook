@@ -20,13 +20,13 @@
     </div>
     <div class="list-item-actions">
         {% if not book_lent %}
-            <form method="post" action="{{ path('app_request_accept', {id: request.id}) }}">
+            <form method="post" action="{{ path('app_request_accept', {id: request.id}) }}" data-turbo-confirm="{{ 'confirm.request_accept'|trans({name: request.requester.name, title: request.book.title}) }}" data-confirm-button="{{ 'request.accept'|trans }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('respond-request-' ~ request.id) }}">
                 <input type="hidden" name="from" value="{{ from }}">
                 <button type="submit" class="btn btn-success btn-sm" title="{{ 'request.accept_hint'|trans }}">{{ icon('check', 'icon-sm') }} {{ 'request.accept'|trans }}</button>
             </form>
         {% endif %}
-        <form method="post" action="{{ path('app_request_decline', {id: request.id}) }}">
+        <form method="post" action="{{ path('app_request_decline', {id: request.id}) }}" data-turbo-confirm="{{ 'confirm.request_decline'|trans({name: request.requester.name}) }}" data-confirm-button="{{ 'request.decline'|trans }}">
             <input type="hidden" name="_token" value="{{ csrf_token('respond-request-' ~ request.id) }}">
             <input type="hidden" name="from" value="{{ from }}">
             <button type="submit" class="btn btn-secondary btn-sm">{{ icon('x', 'icon-sm') }} {{ 'request.decline'|trans }}</button>

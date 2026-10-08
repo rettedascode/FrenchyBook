@@ -18,6 +18,8 @@ Turbo.config.forms.confirm = (message, element) => {
     const button = dialog.querySelector('button[value=confirm]');
     button.dataset.defaultHtml ??= button.innerHTML;
     const label = element?.dataset?.confirmButton;
+    const title = document.getElementById('confirm-dialog-title');
+    if (title?.dataset.generic) title.textContent = label ? title.dataset.generic : title.dataset.delete;
     if (label) {
         button.textContent = label;
         button.className = 'btn btn-primary';

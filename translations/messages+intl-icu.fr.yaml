@@ -54,6 +54,15 @@ confirm:
   title: 'Vraiment supprimer ?'
   cancel: 'Annuler'
   delete: 'Supprimer'
+  title_generic: 'Tu es sûr ?'
+  return: '« {title} » est bien de retour chez toi ? Le prêt sera terminé.'
+  handover_owner: 'Tu as bien donné le livre à {name} ? La durée du prêt commence maintenant.'
+  handover_borrower: 'Tu as bien reçu le livre ? La durée du prêt commence maintenant.'
+  waitlist_leave: 'Quitter la liste d’attente pour « {title} » ?'
+  request_cancel: 'Retirer ta demande pour « {title} » ?'
+  request_accept: 'Accepter la demande de {name} pour « {title} » ? Le livre sera réservé pour {name}.'
+  request_decline: 'Refuser la demande de {name} ? {name} recevra un message.'
+  owner_change: 'Vraiment changer le propriétaire de « {title} » ?'
 
 date:
   today: 'aujourd’hui'

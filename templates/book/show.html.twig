@@ -89,7 +89,7 @@
                         <p><strong>{{ 'loan.reserved_for'|trans({name: activeLoan.borrower.name}) }}</strong><br>
                            <span class="subtle">{{ 'loan.handover_owner_hint'|trans({name: activeLoan.borrower.name}) }}</span></p>
                     </div>
-                    <form method="post" action="{{ path('app_loan_handover', {id: activeLoan.id}) }}">
+                    <form method="post" action="{{ path('app_loan_handover', {id: activeLoan.id}) }}" data-turbo-confirm="{{ 'confirm.handover_owner'|trans({name: activeLoan.borrower.name}) }}" data-confirm-button="{{ 'loan.handover_owner'|trans }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ activeLoan.id) }}">
                         <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('check') }} {{ 'loan.handover_owner'|trans }}</button>
                     </form>
@@ -116,7 +116,7 @@
                     {% if book.waitlist is not empty %}
                         <p class="subtle" style="margin:0">{{ icon('users', 'icon-sm inline-icon') }} {{ 'waitlist.owner_list'|trans({count: book.waitlist|length, names: book.waitlist|map(e => e.user.name)|join(', ')}) }}</p>
                     {% endif %}
-                    <form method="post" action="{{ path('app_loan_return', {id: activeLoan.id}) }}">
+                    <form method="post" action="{{ path('app_loan_return', {id: activeLoan.id}) }}" data-turbo-confirm="{{ 'confirm.return'|trans({title: book.title}) }}" data-confirm-button="{{ 'dashboard.is_back'|trans }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('return-loan-' ~ activeLoan.id) }}">
                         <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('return') }} {{ 'loan.mark_returned'|trans }}</button>
                     </form>
@@ -141,7 +141,7 @@
                         <p><strong>{{ 'loan.reserved_for_you'|trans }}</strong><br>
                            <span class="subtle">{{ 'loan.pickup_at'|trans({name: book.owner.name, district: book.owner.locationLabel ?: '–'}) }}</span></p>
                     </div>
-                    <form method="post" action="{{ path('app_loan_handover', {id: activeLoan.id}) }}">
+                    <form method="post" action="{{ path('app_loan_handover', {id: activeLoan.id}) }}" data-turbo-confirm="{{ 'confirm.handover_borrower'|trans({}) }}" data-confirm-button="{{ 'loan.handover_borrower'|trans }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ activeLoan.id) }}">
                         <button type="submit" class="btn btn-primary btn-block btn-lg">{{ icon('check') }} {{ 'loan.handover_borrower'|trans }}</button>
                     </form>
@@ -182,7 +182,7 @@
                 {% if my_position %}
                     <div class="card card-tight status-card">
                         <p style="margin:0"><strong>{{ 'waitlist.your_position'|trans({position: my_position}) }}</strong><br><span class="subtle">{{ 'waitlist.you_get_notified'|trans }}</span></p>
-                        <form method="post" action="{{ path('app_waitlist_leave', {id: book.id}) }}">
+                        <form method="post" action="{{ path('app_waitlist_leave', {id: book.id}) }}" data-turbo-confirm="{{ 'confirm.waitlist_leave'|trans({title: book.title}) }}" data-confirm-button="{{ 'waitlist.leave_short'|trans }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('waitlist-' ~ book.id) }}">
                             <button type="submit" class="btn btn-ghost btn-block">{{ 'waitlist.leave'|trans }}</button>
                         </form>
@@ -201,7 +201,7 @@
                         <span class="avatar" style="--av: {{ avatar_color(book.owner) }}" aria-hidden="true">{{ book.owner.initial }}</span>
                         <p><strong>{{ 'request.pending'|trans({name: book.owner.name}) }}</strong><br><span class="subtle">{{ 'request.pending_since'|trans({when: myRequest.createdAt|relative_date}) }}</span></p>
                     </div>
-                    <form method="post" action="{{ path('app_request_cancel', {id: myRequest.id}) }}">
+                    <form method="post" action="{{ path('app_request_cancel', {id: myRequest.id}) }}" data-turbo-confirm="{{ 'confirm.request_cancel'|trans({title: book.title}) }}" data-confirm-button="{{ 'request.cancel_short'|trans }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('cancel-request-' ~ myRequest.id) }}">
                         <button type="submit" class="btn btn-secondary btn-block">{{ 'request.cancel'|trans }}</button>
                     </form>

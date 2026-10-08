@@ -73,13 +73,13 @@
                     </div>
                     <div class="list-item-actions">
                         {% if not loan.handedOver %}
-                            <form method="post" action="{{ path('app_loan_handover', {id: loan.id}) }}">
+                            <form method="post" action="{{ path('app_loan_handover', {id: loan.id}) }}" data-turbo-confirm="{{ 'confirm.handover_owner'|trans({name: loan.borrower.name}) }}" data-confirm-button="{{ 'loan.handover_owner'|trans }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ loan.id) }}">
                                 <input type="hidden" name="from" value="dashboard">
                                 <button type="submit" class="btn btn-primary btn-sm">{{ icon('check', 'icon-sm') }} {{ 'loan.handover_owner_short'|trans }}</button>
                             </form>
                         {% else %}
-                            <form method="post" action="{{ path('app_loan_return', {id: loan.id}) }}">
+                            <form method="post" action="{{ path('app_loan_return', {id: loan.id}) }}" data-turbo-confirm="{{ 'confirm.return'|trans({title: loan.book.title}) }}" data-confirm-button="{{ 'dashboard.is_back'|trans }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('return-loan-' ~ loan.id) }}">
                                 <input type="hidden" name="from" value="dashboard">
                                 <button type="submit" class="btn btn-secondary btn-sm">{{ icon('return', 'icon-sm') }} {{ 'dashboard.is_back'|trans }}</button>
@@ -121,7 +121,7 @@
                     </div>
                     {% if not loan.handedOver %}
                         <div class="list-item-actions">
-                            <form method="post" action="{{ path('app_loan_handover', {id: loan.id}) }}">
+                            <form method="post" action="{{ path('app_loan_handover', {id: loan.id}) }}" data-turbo-confirm="{{ 'confirm.handover_borrower'|trans({}) }}" data-confirm-button="{{ 'loan.handover_borrower'|trans }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('handover-loan-' ~ loan.id) }}">
                                 <input type="hidden" name="from" value="dashboard">
                                 <button type="submit" class="btn btn-primary btn-sm">{{ icon('check', 'icon-sm') }} {{ 'loan.handover_borrower'|trans }}</button>
@@ -149,7 +149,7 @@
                         </div>
                     </div>
                     <div class="list-item-actions">
-                        <form method="post" action="{{ path('app_waitlist_leave', {id: entry.book.id}) }}">
+                        <form method="post" action="{{ path('app_waitlist_leave', {id: entry.book.id}) }}" data-turbo-confirm="{{ 'confirm.waitlist_leave'|trans({title: entry.book.title}) }}" data-confirm-button="{{ 'waitlist.leave_short'|trans }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('waitlist-' ~ entry.book.id) }}">
                             <input type="hidden" name="from" value="dashboard">
                             <button type="submit" class="btn btn-ghost btn-sm">{{ 'waitlist.leave_short'|trans }}</button>
@@ -174,7 +174,7 @@
                         <div class="list-item-meta">{{ 'dashboard.requested_at'|trans({when: request.createdAt|relative_date}) }} <strong>{{ request.book.owner.name }}</strong></div>
                     </div>
                     <div class="list-item-actions">
-                        <form method="post" action="{{ path('app_request_cancel', {id: request.id}) }}">
+                        <form method="post" action="{{ path('app_request_cancel', {id: request.id}) }}" data-turbo-confirm="{{ 'confirm.request_cancel'|trans({title: request.book.title}) }}" data-confirm-button="{{ 'request.cancel_short'|trans }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('cancel-request-' ~ request.id) }}">
                             <input type="hidden" name="from" value="dashboard">
                             <button type="submit" class="btn btn-ghost btn-sm">{{ 'request.cancel_short'|trans }}</button>

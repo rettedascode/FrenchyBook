@@ -31,7 +31,7 @@
                 <a class="btn btn-secondary btn-sm" href="{{ path('app_book_edit', {id: book.id}) }}">{{ icon('pencil', 'icon-sm') }} {{ 'book.show.edit'|trans }}</a>
                 <details class="admin-inline">
                     <summary class="btn btn-ghost btn-sm">{{ icon('users', 'icon-sm') }} {{ 'admin.books.change_owner'|trans }}</summary>
-                    <form method="post" action="{{ path('admin_book_owner', {id: book.id}) }}" class="form admin-inline-form">
+                    <form method="post" action="{{ path('admin_book_owner', {id: book.id}) }}" class="form admin-inline-form" data-turbo-confirm="{{ 'confirm.owner_change'|trans({title: book.title}) }}" data-confirm-button="{{ 'profile.save'|trans }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('admin-book-owner-' ~ book.id) }}">
                         <input type="hidden" name="q" value="{{ query }}">
                         <label class="visually-hidden" for="owner-{{ book.id }}">{{ 'admin.books.new_owner'|trans }}</label>
